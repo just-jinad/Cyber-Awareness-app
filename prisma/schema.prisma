@@ -20,7 +20,8 @@ model User {
 model Module {
   id        Int      @id @default(autoincrement())
   title     String
-  content   String
+  content   String   @db.LongText
+  imageUrl  String?  // Optional image URL
   createdAt DateTime @default(now())
   progress  UserProgress[]
 }
