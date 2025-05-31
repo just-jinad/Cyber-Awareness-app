@@ -7,6 +7,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'react-hot-toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 
 interface Module {
   id: number;
@@ -21,6 +22,8 @@ export default function Dashboard() {
   const [newModule, setNewModule] = useState({ title: '', content: '', image: null as File | null });
   const [editingModule, setEditingModule] = useState<Module | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [moduleToDelete, setModuleToDelete] = useState<number | null>(null);
 
   const fetchModules = async () => {
     const res = await fetch('/api/modules');
@@ -85,9 +88,20 @@ export default function Dashboard() {
   };
 
   const handleDeleteModule = async (id: number) => {
-    const res = await fetch(`/api/modules/${id}`, {
+    setModuleToDelete(id);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteModule = async () => {
+    if (moduleToDelete === null) return;
+    const formData = new FormData();
+    formData.append('id', moduleToDelete.toString());
+    const res = await fetch('/api/modules', {
       method: 'DELETE',
+      body: formData,
     });
+    setShowDeleteModal(false);
+    setModuleToDelete(null);
     if (res.ok) {
       toast.success('Module deleted!');
       fetchModules();
@@ -212,6 +226,24 @@ export default function Dashboard() {
           </Card>
         ))}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Delete</DialogTitle>
+          </DialogHeader>
+          <p>Are you sure you want to delete this module? This action cannot be undone.</p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDeleteModal(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDeleteModule}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
