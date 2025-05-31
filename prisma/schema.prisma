@@ -1,0 +1,49 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  progress  UserProgress[]
+}
+
+model Module {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+  progress  UserProgress[]
+}
+
+model Quiz {
+  id            Int      @id @default(autoincrement())
+  question      String
+  options       Json
+  correctAnswer Int
+  createdAt     DateTime @default(now())
+}
+
+model UserProgress {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  moduleId    Int
+  score       Int
+  completedAt DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id])
+  module      Module   @relation(fields: [moduleId], references: [id])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
