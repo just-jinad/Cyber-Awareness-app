@@ -1,15 +1,47 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { uploadImage, deleteImage } from '@/lib/cloudinary';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 const prisma = new PrismaClient();
 
-export async function GET() {
+interface Module {
+  id: number;
+  title: string;
+  content: string;
+  imageUrl?: string;
+}
+
+export async function GET(request: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const { pathname } = new URL(request.url);
+  const id = pathname.split('/').pop();
+
+  if (id && id !== 'modules') {
+    const module = await prisma.module.findUnique({
+      where: { id: parseInt(id) },
+    });
+    if (!module) {
+      return NextResponse.json({ error: 'Module not found' }, { status: 404 });
+    }
+    return NextResponse.json(module, { status: 200 });
+  }
+
   const modules = await prisma.module.findMany();
   return NextResponse.json(modules, { status: 200 });
 }
 
 export async function POST(request: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.role || session.user.role !== 'ADMIN') {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const formData = await request.formData();
     const title = formData.get('title') as string;
@@ -30,7 +62,6 @@ export async function POST(request: Request) {
     });
     return NextResponse.json({ message: 'Module added' }, { status: 200 });
   } catch (error) {
-    console.error('Error in POST /api/modules:', error);
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   } finally {
     await prisma.$disconnect();
@@ -38,9 +69,15 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.role || session.user.role !== 'ADMIN') {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
+    const url = new URL(request.url);
+    const id = parseInt(url.pathname.split('/').pop() || '0');
     const formData = await request.formData();
-    const id = parseInt(formData.get('id') as string);
     const title = formData.get('title') as string;
     const content = formData.get('content') as string;
     const image = formData.get('image') as File | null;
@@ -56,13 +93,16 @@ export async function PUT(request: Request) {
       imageUrl = await uploadImage(image);
     }
 
-    await prisma.module.update({
+    const module = await prisma.module.update({
       where: { id },
-      data: { title, content, imageUrl },
+      data: {
+        title,
+        content,
+        imageUrl,
+      },
     });
     return NextResponse.json({ message: 'Module updated' }, { status: 200 });
   } catch (error) {
-    console.error('Error in PUT /api/modules:', error);
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   } finally {
     await prisma.$disconnect();
@@ -70,9 +110,14 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.role || session.user.role !== 'ADMIN') {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
-    const formData = await request.formData();
-    const id = parseInt(formData.get('id') as string);
+    const url = new URL(request.url);
+    const id = parseInt(url.pathname.split('/').pop() || '0');
 
     const module = await prisma.module.findUnique({ where: { id } });
     if (module?.imageUrl) {
@@ -83,7 +128,6 @@ export async function DELETE(request: Request) {
     await prisma.module.delete({ where: { id } });
     return NextResponse.json({ message: 'Module deleted' }, { status: 200 });
   } catch (error) {
-    console.error('Error in DELETE /api/modules:', error);
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   } finally {
     await prisma.$disconnect();

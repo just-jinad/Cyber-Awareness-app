@@ -1,50 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
+model module {
+  id           Int            @id @default(autoincrement())
+  title        String
+  content      String         @db.LongText
+  createdAt    DateTime       @default(now())
+  imageUrl     String?
+  userprogress userprogress[]
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique
-  email     String   @unique
-  password  String
-  role      Role     @default(USER)
-  createdAt DateTime @default(now())
-  progress  UserProgress[]
-}
-
-model Module {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String   @db.LongText
-  imageUrl  String?  // Optional image URL
-  createdAt DateTime @default(now())
-  progress  UserProgress[]
-}
-
-model Quiz {
+model quiz {
   id            Int      @id @default(autoincrement())
   question      String
-  options       Json
+  options       String   @db.LongText
   correctAnswer Int
   createdAt     DateTime @default(now())
 }
 
-model UserProgress {
+model simulation {
+  id            Int      @id @default(autoincrement())
+  title         String
+  scenario      String
+  choices       String   @db.LongText
+  correctAction Int
+  createdAt     DateTime @default(now())
+}
+
+model user {
+  id           Int            @id @default(autoincrement())
+  username     String         @unique(map: "User_username_key")
+  email        String         @unique(map: "User_email_key")
+  password     String
+  role         user_role      @default(USER)
+  createdAt    DateTime       @default(now())
+  userprogress userprogress[]
+}
+
+model userprogress {
   id          Int      @id @default(autoincrement())
   userId      Int
   moduleId    Int
   score       Int
   completedAt DateTime @default(now())
-  user        User     @relation(fields: [userId], references: [id])
-  module      Module   @relation(fields: [moduleId], references: [id])
+  module      module   @relation(fields: [moduleId], references: [id], map: "UserProgress_moduleId_fkey")
+  user        user     @relation(fields: [userId], references: [id], map: "UserProgress_userId_fkey")
+
+  @@index([moduleId], map: "UserProgress_moduleId_fkey")
+  @@index([userId], map: "UserProgress_userId_fkey")
 }
 
-enum Role {
+enum user_role {
   USER
   ADMIN
 }

@@ -1,249 +1,76 @@
 'use client';
 
-import { useSession, signOut } from 'next-auth/react';
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { toast } from 'react-hot-toast';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 
-interface Module {
-  id: number;
-  title: string;
-  content: string;
-  imageUrl?: string;
+interface Metrics {
+  totalModules: number;
+  totalSimulations: number;
+  totalQuizzes: number;
 }
 
-export default function Dashboard() {
-  const { data: session, status } = useSession();
-  const [modules, setModules] = useState<Module[]>([]);
-  const [newModule, setNewModule] = useState({ title: '', content: '', image: null as File | null });
-  const [editingModule, setEditingModule] = useState<Module | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [moduleToDelete, setModuleToDelete] = useState<number | null>(null);
-
-  const fetchModules = async () => {
-    const res = await fetch('/api/modules');
-    const data: Module[] = await res.json();
-    setModules(data);
-  };
+export default function DashboardHome() {
+  const [metrics, setMetrics] = useState<Metrics>({ totalModules: 0, totalSimulations: 0, totalQuizzes: 0 });
 
   useEffect(() => {
-    if (status === 'authenticated') {
-      fetchModules();
-    }
-  }, [status]);
+    const fetchMetrics = async () => {
+      const [modulesRes, simulationsRes, quizzesRes] = await Promise.all([
+        fetch('/api/modules'),
+        fetch('/api/simulations'),
+        fetch('/api/quizzes'),
+      ]);
 
-  const handleAddModule = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    const formData = new FormData();
-    formData.append('title', newModule.title);
-    formData.append('content', newModule.content);
-    if (newModule.image) {
-      formData.append('image', newModule.image);
-    }
+      const modules = await modulesRes.json();
+      const simulations = await simulationsRes.json();
+      const quizzes = await quizzesRes.json();
 
-    const res = await fetch('/api/modules', {
-      method: 'POST',
-      body: formData,
-    });
-    setLoading(false);
-    if (res.ok) {
-      toast.success('Module added!');
-      setNewModule({ title: '', content: '', image: null });
-      fetchModules();
-    } else {
-      toast.error('Failed to add module');
-    }
-  };
+      setMetrics({
+        totalModules: Array.isArray(modules) ? modules.length : 0,
+        totalSimulations: Array.isArray(simulations) ? simulations.length : 0,
+        totalQuizzes: Array.isArray(quizzes) ? quizzes.length : 0,
+      });
+    };
 
-  const handleEditModule = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingModule) return;
-    setLoading(true);
-    const formData = new FormData();
-    formData.append('title', editingModule.title);
-    formData.append('content', editingModule.content);
-    if (newModule.image) {
-      formData.append('image', newModule.image);
-    }
-
-    const res = await fetch(`/api/modules/${editingModule.id}`, {
-      method: 'PUT',
-      body: formData,
-    });
-    setLoading(false);
-    if (res.ok) {
-      toast.success('Module updated!');
-      setEditingModule(null);
-      setNewModule({ title: '', content: '', image: null });
-      fetchModules();
-    } else {
-      toast.error('Failed to update module');
-    }
-  };
-
-  const handleDeleteModule = async (id: number) => {
-    setModuleToDelete(id);
-    setShowDeleteModal(true);
-  };
-
-  const confirmDeleteModule = async () => {
-    if (moduleToDelete === null) return;
-    const formData = new FormData();
-    formData.append('id', moduleToDelete.toString());
-    const res = await fetch('/api/modules', {
-      method: 'DELETE',
-      body: formData,
-    });
-    setShowDeleteModal(false);
-    setModuleToDelete(null);
-    if (res.ok) {
-      toast.success('Module deleted!');
-      fetchModules();
-    } else {
-      toast.error('Failed to delete module');
-    }
-  };
-
-  if (status === 'loading') {
-    return <div>Loading...</div>;
-  }
-
-  if (!session?.user?.role || session.user.role !== 'ADMIN') {
-    return <div>Access Denied</div>;
-  }
+    fetchMetrics();
+  }, []);
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between mb-6">
-        <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-        <Button onClick={() => signOut({ callbackUrl: '/auth/signin' })}>Sign Out</Button>
+    <div>
+      <h1 className="text-2xl font-bold mb-6">Dashboard Overview</h1>
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card>
+          <CardHeader>
+            <CardTitle>Total Modules</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-semibold">{metrics.totalModules}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Total Simulations</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-semibold">{metrics.totalSimulations}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Total Quizzes</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-semibold">{metrics.totalQuizzes}</p>
+          </CardContent>
+        </Card>
       </div>
-
-      {/* Add/Edit Module Form */}
-      <Card className="mb-6">
+      <Card className="mt-6">
         <CardHeader>
-          <CardTitle>{editingModule ? 'Edit Module' : 'Add New Module'}</CardTitle>
+          <CardTitle>Notifications</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={editingModule ? handleEditModule : handleAddModule} className="space-y-4">
-            <div>
-              <Label htmlFor="title">Module Title</Label>
-              <Input
-                id="title"
-                value={editingModule ? editingModule.title : newModule.title}
-                onChange={(e) =>
-                  editingModule
-                    ? setEditingModule({ ...editingModule, title: e.target.value })
-                    : setNewModule({ ...newModule, title: e.target.value })
-                }
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="content">Module Content</Label>
-              <Input
-                id="content"
-                value={editingModule ? editingModule.content : newModule.content}
-                onChange={(e) =>
-                  editingModule
-                    ? setEditingModule({ ...editingModule, content: e.target.value })
-                    : setNewModule({ ...newModule, content: e.target.value })
-                }
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="image">Module Image (Optional)</Label>
-              <Input
-                id="image"
-                type="file"
-                accept="image/jpeg,image/jpg,image/png"
-                onChange={(e) => {
-                  const file = e.target.files?.[0] || null;
-                  setNewModule({ ...newModule, image: file });
-                }}
-              />
-            </div>
-            <Button type="submit" disabled={loading}>
-              {editingModule ? (loading ? 'Updating...' : 'Update Module') : (loading ? 'Adding...' : 'Add Module')}
-            </Button>
-            {editingModule && (
-              <Button
-                variant="outline"
-                className="ml-2"
-                onClick={() => {
-                  setEditingModule(null);
-                  setNewModule({ title: '', content: '', image: null });
-                }}
-              >
-                Cancel
-              </Button>
-            )}
-          </form>
+          <p>No new notifications.</p>
         </CardContent>
       </Card>
-
-      {/* List Modules */}
-      <div className="grid gap-4">
-        {modules.map((module) => (
-          <Card key={module.id}>
-            <CardHeader>
-              <CardTitle>{module.title}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>{module.content}</p>
-              {module.imageUrl && (
-                <img
-                  src={module.imageUrl}
-                  alt={module.title}
-                  className="mt-2 max-w-xs"
-                />
-              )}
-              <div className="mt-4 space-x-2">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setEditingModule(module);
-                    setNewModule({ title: '', content: '', image: null });
-                  }}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="destructive"
-                  onClick={() => handleDeleteModule(module.id)}
-                >
-                  Delete
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Confirm Delete</DialogTitle>
-          </DialogHeader>
-          <p>Are you sure you want to delete this module? This action cannot be undone.</p>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDeleteModal(false)}>
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={confirmDeleteModule}>
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
