@@ -1,4 +1,3 @@
-// app/api/simulations/route.ts
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { getServerSession } from 'next-auth/next';
@@ -10,7 +9,7 @@ interface Step {
   scenario: string;
   options: string[];
   nextStep: (number | null)[];
-  outcome?: string;
+  outcomes?: string[];
 }
 
 const validateSteps = (steps: any[]): boolean => {
@@ -18,6 +17,7 @@ const validateSteps = (steps: any[]): boolean => {
   return steps.every((step, index) => {
     if (typeof step.scenario !== 'string' || !Array.isArray(step.options) || !Array.isArray(step.nextStep)) return false;
     if (step.options.length !== step.nextStep.length) return false;
+    if (step.outcomes && (!Array.isArray(step.outcomes) || step.outcomes.length !== step.options.length)) return false;
     return step.nextStep.every((next: number | null, i: number) => {
       if (next === null) return true;
       return typeof next === 'number' && next >= 0 && next < steps.length && next !== index;
@@ -50,7 +50,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
-  if (!session || !session.user?.role || session.user.role !== 'ADMIN') {
+  if (!session || !session.user || session.user.role !== 'ADMIN') {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

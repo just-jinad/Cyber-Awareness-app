@@ -12,24 +12,28 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 interface Step {
   scenario: string;
   options: string[];
-  nextStep: (number | null)[]; // Updated to allow numbers or null
-  outcome?: string;
+  nextStep: (number | null)[];
+  outcomes?: string[];
 }
 
 export default function CreateSimulation() {
   const [newSimulation, setNewSimulation] = useState({
     title: '',
-    steps: [{ scenario: '', options: ['', ''], nextStep: [null, null] as (number | null)[], outcome: '' }],
+    steps: [{ scenario: '', options: ['', ''], nextStep: [null, null] as (number | null)[], outcomes: ['', ''] }],
   });
   const router = useRouter();
 
   const handleAddSimulation = async (e: React.FormEvent) => {
     e.preventDefault();
+    const updatedSteps = newSimulation.steps.map(step => ({
+      ...step,
+      outcomes: step.options.map((_, idx) => step.outcomes?.[idx] || ''),
+    }));
     try {
       const res = await fetch('/api/simulations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newSimulation),
+        body: JSON.stringify({ ...newSimulation, steps: updatedSteps }),
       });
       if (res.ok) {
         toast.success('Simulation created successfully!');
@@ -46,7 +50,7 @@ export default function CreateSimulation() {
   const addStep = () => {
     setNewSimulation({
       ...newSimulation,
-      steps: [...newSimulation.steps, { scenario: '', options: ['', ''], nextStep: [null, null] as (number | null)[], outcome: '' }],
+      steps: [...newSimulation.steps, { scenario: '', options: ['', ''], nextStep: [null, null] as (number | null)[], outcomes: ['', ''] }],
     });
   };
 
@@ -59,6 +63,32 @@ export default function CreateSimulation() {
     }
   };
 
+  const addOption = (stepIndex: number) => {
+    const updatedSteps = [...newSimulation.steps];
+    updatedSteps[stepIndex] = {
+      ...updatedSteps[stepIndex],
+      options: [...updatedSteps[stepIndex].options, ''],
+      nextStep: [...updatedSteps[stepIndex].nextStep, null],
+      outcomes: [...(updatedSteps[stepIndex].outcomes || []), ''],
+    };
+    setNewSimulation({ ...newSimulation, steps: updatedSteps });
+  };
+
+  const removeOption = (stepIndex: number, optionIndex: number) => {
+    const updatedSteps = [...newSimulation.steps];
+    if (updatedSteps[stepIndex].options.length <= 2) {
+      toast.error('Each step must have at least two options');
+      return;
+    }
+    updatedSteps[stepIndex] = {
+      ...updatedSteps[stepIndex],
+      options: updatedSteps[stepIndex].options.filter((_, idx) => idx !== optionIndex),
+      nextStep: updatedSteps[stepIndex].nextStep.filter((_, idx) => idx !== optionIndex),
+      outcomes: (updatedSteps[stepIndex].outcomes || []).filter((_, idx) => idx !== optionIndex),
+    };
+    setNewSimulation({ ...newSimulation, steps: updatedSteps });
+  };
+
   const updateStep = (stepIndex: number, field: keyof Step, value: any) => {
     const updatedSteps = [...newSimulation.steps];
     if (field === 'options') {
@@ -67,6 +97,7 @@ export default function CreateSimulation() {
         ...updatedSteps[stepIndex],
         [field]: updatedOptions,
         nextStep: Array(updatedOptions.length).fill(null) as (number | null)[],
+        outcomes: Array(updatedOptions.length).fill('') as string[],
       };
     } else if (field === 'nextStep') {
       const updatedNextStep = value as (number | null)[];
@@ -75,6 +106,13 @@ export default function CreateSimulation() {
         return;
       }
       updatedSteps[stepIndex] = { ...updatedSteps[stepIndex], [field]: updatedNextStep };
+    } else if (field === 'outcomes') {
+      const updatedOutcomes = value as string[];
+      if (updatedOutcomes.length !== updatedSteps[stepIndex].options.length) {
+        toast.error('Number of outcomes must match number of options');
+        return;
+      }
+      updatedSteps[stepIndex] = { ...updatedSteps[stepIndex], [field]: updatedOutcomes };
     } else {
       updatedSteps[stepIndex] = { ...updatedSteps[stepIndex], [field]: value };
     }
@@ -91,8 +129,21 @@ export default function CreateSimulation() {
   const updateNextStep = (stepIndex: number, optionIndex: number, value: string) => {
     const updatedSteps = [...newSimulation.steps];
     const updatedNextStep = [...updatedSteps[stepIndex].nextStep];
-    updatedNextStep[optionIndex] = value === 'end' ? null : parseInt(value, 10);
+    if (value === 'end') {
+      updatedNextStep[optionIndex] = null;
+    } else if (value.startsWith('future-step-')) {
+      updatedNextStep[optionIndex] = parseInt(value.split('-')[2], 10);
+    } else if (value.startsWith('next-step-')) {
+      updatedNextStep[optionIndex] = parseInt(value.split('-')[2], 10);
+    }
     updateStep(stepIndex, 'nextStep', updatedNextStep);
+  };
+
+  const updateOutcome = (stepIndex: number, optionIndex: number, value: string) => {
+    const updatedSteps = [...newSimulation.steps];
+    const updatedOutcomes = [...(updatedSteps[stepIndex].outcomes || [])];
+    updatedOutcomes[optionIndex] = value;
+    updateStep(stepIndex, 'outcomes', updatedOutcomes);
   };
 
   return (
@@ -135,48 +186,95 @@ export default function CreateSimulation() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Options</Label>
+                  <div className="flex justify-between items-center">
+                    <Label>Options</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => addOption(stepIndex)}
+                      className="text-sm"
+                    >
+                      Add Option
+                    </Button>
+                  </div>
                   {step.options.map((option, optionIndex) => (
-                    <div key={optionIndex} className="flex items-center space-x-4">
-                      <Input
-                        value={option}
-                        onChange={(e) => updateOption(stepIndex, optionIndex, e.target.value)}
-                        placeholder={`Option ${optionIndex + 1}`}
-                        required
-                        className="flex-1"
-                      />
-                      <div className="flex items-center space-x-2">
-                        <Label>Next Step</Label>
-                        <Select
-                          value={step.nextStep[optionIndex] === null ? 'end' : step.nextStep[optionIndex]!.toString()}
-                          onValueChange={(value) => updateNextStep(stepIndex, optionIndex, value)}
-                        >
-                          <SelectTrigger className="w-40">
-                            <SelectValue placeholder="Select next step" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="end">End Simulation</SelectItem>
-                            {newSimulation.steps.map((_, idx) => (
-                              idx !== stepIndex && (
-                                <SelectItem key={idx} value={idx.toString()}>
-                                  Step {idx + 1}
+                    <div key={optionIndex} className="flex flex-col space-y-2">
+                      <div className="flex items-center space-x-4">
+                        <Input
+                          value={option}
+                          onChange={(e) => updateOption(stepIndex, optionIndex, e.target.value)}
+                          placeholder={`Option ${optionIndex + 1}`}
+                          required
+                          className="flex-1"
+                        />
+                        <div className="flex items-center space-x-2">
+                          <Label>Next Step</Label>
+                          <Select
+                            value={
+                              step.nextStep[optionIndex] === null
+                                ? 'end'
+                                : newSimulation.steps.findIndex((_, idx) => idx === step.nextStep[optionIndex]) >
+                                    stepIndex + 1
+                                ? `future-step-${step.nextStep[optionIndex]}`
+                                : `next-step-${step.nextStep[optionIndex]}`
+                            }
+                            onValueChange={(value) => updateNextStep(stepIndex, optionIndex, value)}
+                          >
+                            <SelectTrigger className="w-40">
+                              <SelectValue placeholder="Select next step" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem key="end" value="end">
+                                End Simulation
+                              </SelectItem>
+                              {newSimulation.steps.map((_, idx) => {
+                                const nextStepNum = idx + 1;
+                                if (idx !== stepIndex && nextStepNum > stepIndex + 1) {
+                                  return (
+                                    <SelectItem
+                                      key={`future-step-${idx}`}
+                                      value={`future-step-${idx}`}
+                                    >
+                                      Step {nextStepNum}
+                                    </SelectItem>
+                                  );
+                                }
+                                return null;
+                              })}
+                              {stepIndex + 1 < newSimulation.steps.length && (
+                                <SelectItem
+                                  key={`next-in-sequence-${stepIndex}`}
+                                  value={`next-step-${stepIndex + 1}`}
+                                >
+                                  Step {stepIndex + 2} (Next in Sequence)
                                 </SelectItem>
-                              )
-                            ))}
-                          </SelectContent>
-                        </Select>
+                              )}
+                            </SelectContent>
+                          </Select>
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            onClick={() => removeOption(stepIndex, optionIndex)}
+                            className="text-sm"
+                            disabled={step.options.length <= 2}
+                          >
+                            Remove
+                          </Button>
+                        </div>
                       </div>
+                      {step.nextStep[optionIndex] === null && (
+                        <div className="space-y-2 ml-4">
+                          <Label htmlFor={`outcome-${stepIndex}-${optionIndex}`}>Outcome</Label>
+                          <Input
+                            id={`outcome-${stepIndex}-${optionIndex}`}
+                            value={step.outcomes?.[optionIndex] || ''}
+                            onChange={(e) => updateOutcome(stepIndex, optionIndex, e.target.value)}
+                            placeholder="e.g., 'success', 'neutral', 'breach'"
+                          />
+                        </div>
+                      )}
                     </div>
                   ))}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor={`outcome-${stepIndex}`}>Outcome (if final step)</Label>
-                  <Input
-                    id={`outcome-${stepIndex}`}
-                    value={step.outcome || ''}
-                    onChange={(e) => updateStep(stepIndex, 'outcome', e.target.value)}
-                    placeholder="e.g., 'success' or 'breach'"
-                  />
                 </div>
               </div>
             ))}

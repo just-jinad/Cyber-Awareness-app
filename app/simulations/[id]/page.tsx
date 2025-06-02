@@ -6,12 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { Loader2 } from 'lucide-react';
 
 interface Simulation {
   id: number;
   title: string;
-  steps: { scenario: string; options: string[]; nextStep: (number | null)[]; outcome?: string }[];
+  steps: { scenario: string; options: string[]; nextStep: (number | null)[]; outcomes?: string[] }[];
 }
 
 interface StepState {
@@ -29,12 +28,6 @@ export default function SimulationPage() {
   const [stepState, setStepState] = useState<StepState>({ currentStep: 0, choices: [], timeTaken: 0 });
   const [feedback, setFeedback] = useState<string>('');
   const [fakeCredentials, setFakeCredentials] = useState({ username: '', password: '' });
-  const [showLoader, setShowLoader] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setShowLoader(false), 3000);
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     const fetchSimulation = async () => {
@@ -80,13 +73,10 @@ export default function SimulationPage() {
       setFeedback('');
       setFakeCredentials({ username: '', password: '' });
     } else {
-      // Show a message if this is the end of the simulation
-      let feedbackText = `You chose "${currentStepData.options[optionIndex]}".`;
-      if (currentStepData.outcome) {
-        feedbackText += ` Result: ${currentStepData.outcome}. ${currentStepData.outcome === 'breach' ? 'This exposed your data.' : 'Well done!'}`;
-      } else {
-        feedbackText += ' This is the end of the simulation.';
-      }
+      const outcome = currentStepData.outcomes?.[optionIndex] || 'neutral';
+      const feedbackText = `You chose "${currentStepData.options[optionIndex]}". Result: ${outcome}. ${
+        outcome === 'breach' ? 'This exposed your data.' : outcome === 'success' ? 'Well done!' : 'Neutral outcome.'
+      }`;
       setFeedback(feedbackText);
     }
   };
@@ -99,14 +89,7 @@ export default function SimulationPage() {
     handleAction(0);
   };
 
-  if (showLoader || status === 'loading') {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="animate-spin mr-2" />
-        <span>Loading simulation...</span>
-      </div>
-    );
-  }
+  if (status === 'loading') return <div className="container mx-auto p-6">Loading...</div>;
   if (!session) return <div className="container mx-auto p-6">Please sign in to access this simulation.</div>;
   if (!simulation) return <div className="container mx-auto p-6">Simulation not found.</div>;
 
@@ -194,7 +177,9 @@ export default function SimulationPage() {
           <p className="text-lg">Time Elapsed: {stepState.timeTaken} seconds</p>
           {feedback && (
             <div className="mt-4">
-              <p className={`text-lg ${feedback.includes('breach') ? 'text-red-600' : 'text-green-600'}`}>{feedback}</p>
+              <p className={`text-lg ${feedback.includes('breach') ? 'text-red-600' : feedback.includes('success') ? 'text-green-600' : 'text-gray-600'}`}>
+                {feedback}
+              </p>
               <Button variant="outline" onClick={() => router.push('/simulations')} className="mt-2">
                 Return to Simulations
               </Button>
