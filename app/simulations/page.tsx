@@ -1,11 +1,11 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { toast } from 'react-hot-toast';
+import { useSession } from 'next-auth/react';
+import { Loader2 } from 'lucide-react';
 
 interface Simulation {
   id: number;
@@ -15,75 +15,55 @@ interface Simulation {
   correctAction: number;
 }
 
-export default function Simulations() {
+export default function SimulationsList() {
   const { data: session, status } = useSession();
   const [simulations, setSimulations] = useState<Simulation[]>([]);
-  const [currentSimulation, setCurrentSimulation] = useState<Simulation | null>(null);
-  const [feedback, setFeedback] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchSimulations = async () => {
+      setLoading(true);
+      const res = await fetch('/api/simulations');
+      const data: Simulation[] = await res.json();
+      setSimulations(data);
+      setLoading(false);
+    };
     if (status === 'authenticated') {
-      fetch('/api/simulations')
-        .then((res) => res.json())
-        .then((data) => {
-          setSimulations(data);
-          setCurrentSimulation(data[0] || null);
-        });
+      fetchSimulations();
     }
   }, [status]);
 
-  const handleChoice = async (choiceIndex: number) => {
-    if (!currentSimulation || !session) return;
-
-    const isCorrect = choiceIndex === currentSimulation.correctAction;
-    setFeedback(isCorrect ? 'Correct! You reported the phishing email.' : 'Incorrect. You clicked a phishing link!');
-
-    // Save to UserProgress
-    await fetch('/api/progress', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        simulationId: currentSimulation.id,
-        score: isCorrect ? 100 : 0,
-      }),
-    });
-  };
-
-  if (status === 'loading') {
-    return <div>Loading...</div>;
-  }
-
-  if (!session) {
+  if (status === 'loading' || loading) {
     return (
-      <div className="p-6">
-        <p>Please <Link href="/auth/signin" className="text-blue-500">sign in</Link> to access simulations.</p>
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="animate-spin mr-2" />
+        <span>Loading simulations...</span>
       </div>
     );
   }
 
-  if (!currentSimulation) {
-    return <div className="p-6">No simulations available.</div>;
+  if (!session) {
+    return <div>Please sign in to access simulations.</div>;
   }
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Interactive Simulations</h1>
-      <Card>
-        <CardHeader>
-          <CardTitle>{currentSimulation.title}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="mb-4">{currentSimulation.scenario}</p>
-          <div className="space-x-2">
-            {currentSimulation.choices.map((choice, index) => (
-              <Button key={index} onClick={() => handleChoice(index)}>
-                {choice}
-              </Button>
-            ))}
-          </div>
-          {feedback && <p className="mt-4">{feedback}</p>}
-        </CardContent>
-      </Card>
+      <h1 className="text-2xl font-bold mb-6">Cybersecurity Simulations</h1>
+      <div className="grid gap-4">
+        {simulations.map((simulation) => (
+          <Card key={simulation.id}>
+            <CardHeader>
+              <CardTitle>{simulation.title}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>{simulation.scenario}</p>
+              <Link href={`/simulations/${simulation.id}`}>
+                <Button className="mt-4">Start Simulation</Button>
+              </Link>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 }

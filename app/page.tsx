@@ -7,6 +7,7 @@ export default function Home() {
       <p>
         Navigate to <Link href="/auth/signin" className="text-blue-500">Sign In</Link> to get started, or view our{' '}
         <Link href="/modules" className="text-blue-500">Training Modules</Link>.
+        <Link href="/simulations" className="text-blue-500">Simulation Modules</Link>.
       </p>
     </div>
   );

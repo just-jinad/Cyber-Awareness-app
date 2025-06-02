@@ -24,12 +24,10 @@ model quiz {
   createdAt     DateTime @default(now())
 }
 
-model simulation {
+model Simulation {
   id            Int      @id @default(autoincrement())
   title         String
-  scenario      String
-  choices       String   @db.LongText
-  correctAction Int
+  steps         Json?    // e.g., [{ scenario: "Email from hr-support@company-careers.com", options: ["Click link", "Report"], nextStep: [1, null] }, { scenario: "Fake login page", options: ["Enter credentials", "Close"], outcome: "breach" }]
   createdAt     DateTime @default(now())
 }
 
