@@ -14,14 +14,45 @@ model module {
   createdAt    DateTime       @default(now())
   imageUrl     String?
   userprogress userprogress[]
+  quizzes      Quiz[]         // Added opposite relation for Quiz
 }
 
-model quiz {
-  id            Int      @id @default(autoincrement())
-  question      String
-  options       String   @db.LongText
-  correctAnswer Int
-  createdAt     DateTime @default(now())
+model Quiz {
+  id        Int        @id @default(autoincrement())
+  title     String
+  type      String     // "public", "module-linked", "pin-protected"
+  pin       String?    // Optional pin for pin-protected quizzes
+  moduleId  Int?       // For module-linked quizzes
+  module    module?    @relation(fields: [moduleId], references: [id])
+  questions Question[]
+  results   QuizResult[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Question {
+  id        Int      @id @default(autoincrement())
+  quizId    Int
+  quiz      Quiz     @relation(fields: [quizId], references: [id])
+  type      String   // "multiple-choice", "true-false", "scenario-based"
+  text      String
+  options   Json     // Changed from String[] to Json for MySQL compatibility
+  correct   String   // Correct answer (text of the correct option or "true"/"false")
+  score     Int      // Points for correct answer
+  feedback  String?  // Explanation for the correct answer
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model QuizResult {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  user      user?    @relation(fields: [userId], references: [id])
+  quizId    Int
+  quiz      Quiz     @relation(fields: [quizId], references: [id])
+  score     Int
+  answers   Json     // Store user answers as { questionId: answer }
+  createdAt DateTime @default(now())
 }
 
 model Simulation {
@@ -39,6 +70,7 @@ model user {
   role         user_role      @default(USER)
   createdAt    DateTime       @default(now())
   userprogress userprogress[]
+  quizResults  QuizResult[]   // Added opposite relation for QuizResult
 }
 
 model userprogress {
