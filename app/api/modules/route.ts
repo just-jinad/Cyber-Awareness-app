@@ -3,6 +3,8 @@ import { PrismaClient } from '@prisma/client';
 import { uploadImage, deleteImage } from '@/lib/cloudinary';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/authOptions';
+export const dynamic = 'force-dynamic';
+
 
 const prisma = new PrismaClient();
 
