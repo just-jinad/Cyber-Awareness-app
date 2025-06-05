@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { uploadImage, deleteImage } from '@/lib/cloudinary';
+export const dynamic = 'force-dynamic';
+
 
 const prisma = new PrismaClient();
 
