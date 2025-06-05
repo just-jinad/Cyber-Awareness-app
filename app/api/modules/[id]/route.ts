@@ -4,9 +4,9 @@ import { uploadImage, deleteImage } from '@/lib/cloudinary';
 
 const prisma = new PrismaClient();
 
-export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
+export async function GET(request: Request, context: { params: { id: string } }) {
   try {
-    const { id } = await context.params;
+    const { id } = context.params;
     const moduleId = parseInt(id);
     const module = await prisma.module.findUnique({ where: { id: moduleId } });
     if (!module) {
@@ -21,9 +21,9 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
   }
 }
 
-export async function PUT(request: Request, context: { params: Promise<{ id: string }> }) {
+export async function PUT(request: Request, context: { params: { id: string } }) {
   try {
-    const { id } = await context.params;
+    const { id } = context.params;
     const moduleId = parseInt(id);
     const formData = await request.formData();
     const title = formData.get('title') as string;
@@ -54,9 +54,9 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
   }
 }
 
-export async function DELETE(request: Request, context: { params: Promise<{ id: string }> }) {
+export async function DELETE(request: Request, context: { params: { id: string } }) {
   try {
-    const { id } = await context.params;
+    const { id } = context.params;
     const moduleId = parseInt(id);
     const module = await prisma.module.findUnique({ where: { id: moduleId } });
     if (module?.imageUrl) {
