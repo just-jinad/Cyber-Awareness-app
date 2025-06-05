@@ -1,6 +1,10 @@
+// app/api/auth/signup/route.ts
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+
+// 🔥 THIS LINE IS REQUIRED!
+export const dynamic = 'force-dynamic';
 
 const prisma = new PrismaClient();
 
