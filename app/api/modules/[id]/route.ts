@@ -6,27 +6,27 @@ import { uploadImage, deleteImage } from '@/lib/cloudinary';
 export const dynamic = 'force-dynamic';
 
 // GET Module by ID
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const moduleId = parseInt(params.id);
-    if (isNaN(moduleId)) {
-      return NextResponse.json({ error: 'Invalid module ID' }, { status: 400 });
-    }
+// export async function GET(
+//   request: Request,
+//   { params }: { params: { id: string } }
+// ) {
+//   try {
+//     const moduleId = parseInt(params.id);
+//     if (isNaN(moduleId)) {
+//       return NextResponse.json({ error: 'Invalid module ID' }, { status: 400 });
+//     }
 
-    const module = await prisma.module.findUnique({ where: { id: moduleId } });
-    if (!module) {
-      return NextResponse.json({ error: 'Module not found' }, { status: 404 });
-    }
+//     const module = await prisma.module.findUnique({ where: { id: moduleId } });
+//     if (!module) {
+//       return NextResponse.json({ error: 'Module not found' }, { status: 404 });
+//     }
 
-    return NextResponse.json(module);
-  } catch (error) {
-    console.error('GET error:', error);
-    return NextResponse.json({ error: 'Server error' }, { status: 500 });
-  }
-}
+//     return NextResponse.json(module);
+//   } catch (error) {
+//     console.error('GET error:', error);
+//     return NextResponse.json({ error: 'Server error' }, { status: 500 });
+//   }
+// }
 
 // PUT: Update Module
 export async function PUT(
