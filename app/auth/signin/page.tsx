@@ -28,8 +28,16 @@ export default function Signin() {
       password: data.password,
     });
     if (res?.ok) {
-      toast.success("Sign in successful!");
-      router.push("/dashboard");
+      // Fetch session to get user role
+      const sessionRes = await fetch("/api/auth/session");
+      const session = sessionRes.ok ? await sessionRes.json() : null;
+      if (session?.user?.role === "ADMIN") {
+        toast.success("Sign in successful!");
+        router.push("/dashboard");
+      } else {
+        toast.success("Sign in successful!");
+        router.push("/");
+      }
     } else {
       toast.error("Invalid email or password");
     }

@@ -1,0 +1,126 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { useParams, useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+
+interface Quiz {
+  id: number;
+  title: string;
+  moduleId?: number;
+  questions: { id: number; type: string; text: string; options: string[]; correct: string; score: number; feedback?: string }[];
+}
+
+export default function QuizPage() {
+  const { data: session, status } = useSession();
+  const params = useParams();
+  const router = useRouter();
+  const id = params.id as string;
+  const [quiz, setQuiz] = useState<Quiz | null>(null);
+  const [answers, setAnswers] = useState<{ [key: number]: string }>({});
+  const [score, setScore] = useState<number | null>(null);
+  const [feedback, setFeedback] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchQuiz = async () => {
+      const res = await fetch(`/api/quizzes/${id}`);
+      if (res.ok) {
+        const data = await res.json();
+        setQuiz(data);
+      } else {
+        router.push('/quizzes');
+      }
+    };
+    if (status === 'authenticated') fetchQuiz();
+  }, [id, status, router]);
+
+  const handleSubmit = async () => {
+    if (!quiz || !session) return;
+    let totalScore = 0;
+    const feedbackMessages: string[] = [];
+
+    quiz.questions.forEach((question) => {
+      const userAnswer = answers[question.id];
+      if (userAnswer === question.correct) {
+        totalScore += question.score;
+        feedbackMessages.push(`Question ${question.id}: Correct! ${question.feedback || ''}`);
+      } else {
+        feedbackMessages.push(
+          `Question ${question.id}: Incorrect. The correct answer is "${question.correct}". ${question.feedback || ''}`
+        );
+      }
+    });
+
+    setScore(totalScore);
+    setFeedback(feedbackMessages);
+
+    // Save result with userId
+    await fetch('/api/quiz-results', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ quizId: quiz.id, score: totalScore, answers, userId: session.user?.id }),
+    });
+
+    // Update module progress (placeholder logic)
+    if (quiz.moduleId && session.user?.id) {
+      await fetch(`/api/modules/${quiz.moduleId}/progress`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: session.user.id, completed: true }),
+      });
+    }
+  };
+
+  if (status === 'loading') return <div className="container mx-auto p-6">Loading...</div>;
+  if (!session) return <div className="container mx-auto p-6">Please sign in to access this quiz.</div>;
+  if (!quiz) return <div className="container mx-auto p-6">Quiz not found.</div>;
+
+  return (
+    <div className="container mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-6">{quiz.title}</h1>
+      <Card>
+        <CardHeader>
+          <CardTitle>Quiz</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {quiz.questions.map((question) => (
+            <div key={question.id} className="border rounded-lg p-4">
+              <h3 className="text-lg font-semibold">{question.text}</h3>
+              <RadioGroup
+                value={answers[question.id] || ''}
+                onValueChange={(value: string) => setAnswers({ ...answers, [question.id]: value })}
+                disabled={score !== null}
+              >
+                {question.options.map((option, idx) => (
+                  <div key={idx} className="flex items-center space-x-2">
+                    <RadioGroupItem value={option} id={`${question.id}-${idx}`} />
+                    <Label htmlFor={`${question.id}-${idx}`}>{option}</Label>
+                  </div>
+                ))}
+              </RadioGroup>
+            </div>
+          ))}
+          {score === null ? (
+            <Button onClick={handleSubmit}>Submit</Button>
+          ) : (
+            <div>
+              <p className="text-lg font-semibold">Your Score: {score}</p>
+              {feedback.map((msg, idx) => (
+                <p key={idx} className={msg.includes('Correct') ? 'text-green-600' : 'text-red-600'}>
+                  {msg}
+                </p>
+              ))}
+              <Button variant="outline" onClick={() => router.push('/quizzes')}>
+                Return to Quizzes
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

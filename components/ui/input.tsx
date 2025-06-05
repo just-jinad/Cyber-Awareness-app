@@ -2,7 +2,14 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
-function Input({ className, type, value, ...props }: React.ComponentProps<"input">) {
+function Input({ className, type, ...props }: React.ComponentProps<"input">) {
+  // Only set value if it is not undefined
+  const inputProps = { ...props };
+  if (Object.prototype.hasOwnProperty.call(props, 'value') && props.value !== undefined) {
+    inputProps.value = typeof props.value === 'number' ? (isNaN(props.value) ? '' : String(props.value)) : props.value;
+  } else {
+    delete inputProps.value;
+  }
   return (
     <input
       type={type}
@@ -13,8 +20,7 @@ function Input({ className, type, value, ...props }: React.ComponentProps<"input
         "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
         className
       )}
-      value={typeof value === 'number' ? (isNaN(value) ? '' : String(value)) : value ?? ''}
-      {...props}
+      {...inputProps}
     />
   )
 }
