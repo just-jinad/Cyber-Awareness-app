@@ -1,14 +1,305 @@
 import Link from 'next/link';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import { Lock, Monitor, Shield, Star, Database, Eye, Zap, Users, Award } from 'lucide-react';
 
 export default function Home() {
-  return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold">Welcome to Cybersecurity Awareness Platform</h1>
-      <p>
-        Navigate to <Link href="/auth/signin" className="text-blue-500">Sign In</Link> to get started, or view our{' '}
-        <Link href="/modules" className="text-blue-500">Training Modules</Link>.
-        <Link href="/simulations" className="text-blue-500">Simulation Modules</Link>.
-      </p>
+ return (
+    <div className="min-h-screen bg-slate-900 text-white relative overflow-hidden">
+      {/* Navbar */}
+      <Navbar />
+      
+      {/* Background Pattern */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Gradient overlays */}
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-slate-900 via-blue-900/20 to-slate-900"></div>
+        
+        {/* Floating dots and lines */}
+        <div className="absolute top-32 right-20 w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+        <div className="absolute top-64 left-1/4 w-1 h-1 bg-blue-400 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
+        <div className="absolute bottom-1/3 right-1/3 w-1 h-1 bg-cyan-300 rounded-full animate-pulse" style={{animationDelay: '2s'}}></div>
+        
+        {/* Connection lines */}
+        <svg className="absolute top-20 right-10 w-32 h-32 text-cyan-400/20" viewBox="0 0 100 100">
+          <path d="M20,20 L80,80 M80,20 L20,80" stroke="currentColor" strokeWidth="0.5" fill="none" />
+        </svg>
+        <svg className="absolute bottom-20 left-10 w-24 h-24 text-blue-400/20" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="30" stroke="currentColor" strokeWidth="0.5" fill="none" />
+        </svg>
+      </div>
+
+      {/* Hero Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+          {/* Left Content */}
+          <div className="space-y-8">
+            <div className="space-y-6">
+              <h1 className="text-4xl lg:text-6xl font-bold leading-tight">
+                We Help To Modern{' '}
+                <span className="text-cyan-400">
+                  Information
+                </span>{' '}
+                From Hackers.
+              </h1>
+              <p className="text-lg text-gray-300 leading-relaxed max-w-lg">
+                Protecting your business with comprehensive cybersecurity solutions, advanced threat detection, and expert security monitoring services around the clock.
+              </p>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button className="bg-cyan-500 hover:bg-cyan-600 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300">
+                Get Protected Now
+              </button>
+              <button className="border border-gray-600 hover:border-gray-500 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300 hover:bg-white/5">
+                Learn More
+              </button>
+            </div>
+          </div>
+
+          {/* Right Visual - Lock with Password */}
+          <div className="relative flex justify-center">
+            {/* Main lock container */}
+            <div className="relative">
+              {/* Large lock icon with gradient background */}
+              <div className="w-32 h-32 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-3xl flex items-center justify-center shadow-2xl shadow-cyan-500/25">
+                <Lock className="h-16 w-16 text-white" />
+              </div>
+              
+              {/* Password dots below lock */}
+              <div className="mt-8 bg-slate-800/80 backdrop-blur-none rounded-xl p-6 border border-slate-700 min-w-[280px]">
+                <div className="flex items-center justify-center space-x-3 mb-4">
+                  <Star className="h-5 w-5 text-yellow-400 fill-current" />
+                  <Star className="h-5 w-5 text-yellow-400 fill-current" />
+                  <Star className="h-5 w-5 text-yellow-400 fill-current" />
+                  <Star className="h-5 w-5 text-gray-600" />
+                </div>
+                <div className="text-center text-gray-300 text-sm mb-4">Password Strength</div>
+                <div className="w-full bg-gray-700 rounded-full h-2">
+                  <div className="bg-gradient-to-r from-cyan-400 to-blue-500 h-2 rounded-full w-3/4"></div>
+                </div>
+              </div>
+              
+              {/* Floating connection elements */}
+              <div className="absolute -top-4 -right-4 w-6 h-6 bg-green-400 rounded-full flex items-center justify-center animate-pulse">
+                <div className="w-2 h-2 bg-white rounded-full"></div>
+              </div>
+              
+              <div className="absolute -bottom-4 -left-4 w-8 h-8 bg-slate-800 border-2 border-cyan-400 rounded-lg flex items-center justify-center">
+                <Monitor className="h-4 w-4 text-cyan-400" />
+              </div>
+            </div>
+            
+            {/* Connection lines */}
+            <div className="absolute inset-0 pointer-events-none">
+              <svg className="w-full h-full opacity-30" viewBox="0 0 300 300">
+                <path d="M50,150 Q150,50 250,150" stroke="#22d3ee" strokeWidth="1" fill="none" strokeDasharray="5,5">
+                  <animate attributeName="stroke-dashoffset" values="0;10" dur="2s" repeatCount="indefinite" />
+                </path>
+                <path d="M50,150 Q150,250 250,150" stroke="#3b82f6" strokeWidth="1" fill="none" strokeDasharray="5,5">
+                  <animate attributeName="stroke-dashoffset" values="10;0" dur="2s" repeatCount="indefinite" />
+                </path>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Partner Logos Section */}
+      <div className="bg-slate-800/30 backdrop-blur-none border-y border-slate-700/50 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8">
+            <p className="text-gray-400 text-sm">Our Clients & Partners</p>
+          </div>
+          <div className="flex justify-center items-center space-x-16 opacity-60">
+            <div className="text-gray-400 font-bold text-xl">Spotify</div>
+            <div className="text-gray-400 font-bold text-xl">Amazon</div>
+            <div className="text-gray-400 font-bold text-xl">FedEx</div>
+            <div className="text-gray-400 font-bold text-xl">Google</div>
+            <div className="text-gray-400 font-bold text-xl">Microsoft</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Security Platform Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+          {/* Left Visual - Dashboard */}
+          <div className="relative">
+            <div className="bg-slate-800/50 backdrop-blur-none rounded-2xl p-8 border border-slate-700/50">
+              {/* Header with shield */}
+              <div className="flex items-center space-x-4 mb-8">
+                <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center">
+                  <Shield className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <div className="text-white font-semibold">Security Dashboard</div>
+                  <div className="text-gray-400 text-sm">Real-time monitoring</div>
+                </div>
+              </div>
+              
+              {/* Security metrics grid */}
+              <div className="grid grid-cols-3 gap-4">
+                <div className="bg-slate-900/60 rounded-lg p-4 border border-slate-600/30">
+                  <Database className="h-6 w-6 text-cyan-400 mb-2" />
+                  <div className="text-xs text-gray-400">Data Security</div>
+                  <div className="text-sm font-semibold text-white">98.5%</div>
+                </div>
+                <div className="bg-slate-900/60 rounded-lg p-4 border border-slate-600/30">
+                  <Eye className="h-6 w-6 text-blue-400 mb-2" />
+                  <div className="text-xs text-gray-400">Monitoring</div>
+                  <div className="text-sm font-semibold text-white">24/7</div>
+                </div>
+                <div className="bg-slate-900/60 rounded-lg p-4 border border-slate-600/30">
+                  <Zap className="h-6 w-6 text-yellow-400 mb-2" />
+                  <div className="text-xs text-gray-400">Response</div>
+                  <div className="text-sm font-semibold text-white">&lt;5min</div>
+                </div>
+              </div>
+              
+              {/* Status indicators */}
+              <div className="mt-6 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-300">Threat Detection</span>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span className="text-xs text-green-400">Active</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-300">Firewall Status</span>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span className="text-xs text-green-400">Protected</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Content */}
+          <div className="space-y-8">
+            <div>
+              <h2 className="text-4xl lg:text-5xl font-bold mb-6">
+                Single Platform to Manage{' '}
+                <span className="text-cyan-400">
+                  Your Security & Compliance
+                </span>
+              </h2>
+              <p className="text-lg text-gray-300 leading-relaxed">
+                Comprehensive cybersecurity management through a unified dashboard. Monitor threats, manage compliance, and respond to incidents all from one powerful platform.
+              </p>
+            </div>
+            
+            <div className="space-y-4">
+              {[
+                'Advanced Threat Detection & Prevention',
+                'Real-time Security Monitoring',
+                'Automated Compliance Reporting',
+                'Rapid Incident Response System'
+              ].map((feature, i) => (
+                <div key={i} className="flex items-center space-x-3">
+                  <div className="w-5 h-5 bg-green-400 rounded-full flex items-center justify-center flex-shrink-0">
+                    <div className="w-2 h-2 bg-white rounded-full"></div>
+                  </div>
+                  <span className="text-gray-300">{feature}</span>
+                </div>
+              ))}
+            </div>
+            
+            <button className="bg-cyan-500 hover:bg-cyan-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+              Learn More About Platform
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Services Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl lg:text-5xl font-bold mb-4">
+            We provide best-in-class{' '}
+            <span className="text-cyan-400">
+              Information
+            </span>
+          </h2>
+          <h3 className="text-3xl lg:text-4xl font-bold text-cyan-400">
+            Investigation Security
+          </h3>
+        </div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {[
+            { 
+              icon: Shield, 
+              title: 'Network Security', 
+              desc: 'Advanced firewall protection and intrusion detection systems to safeguard your network infrastructure.',
+              highlight: true
+            },
+            { 
+              icon: Eye, 
+              title: 'Security Monitoring', 
+              desc: 'Continuous 24/7 monitoring of your systems with real-time threat detection and alerts.' 
+            },
+            { 
+              icon: Database, 
+              title: 'Data Protection', 
+              desc: 'Comprehensive data encryption, backup solutions, and secure data storage management.' 
+            },
+            { 
+              icon: Users, 
+              title: 'Access Management', 
+              desc: 'Secure authentication systems and user access control for enhanced security.' 
+            },
+            { 
+              icon: Zap, 
+              title: 'Incident Response', 
+              desc: 'Rapid response team for security incidents with expert remediation services.' 
+            },
+            { 
+              icon: Award, 
+              title: 'Compliance Support', 
+              desc: 'Ensure your business meets industry standards and regulatory compliance requirements.' 
+            }
+          ].map((service, i) => (
+            <div 
+              key={i} 
+              className={`relative bg-slate-800/50 backdrop-blur-none rounded-2xl p-8 border transition-all duration-300 group hover:transform hover:scale-105 ${
+                service.highlight 
+                  ? 'border-cyan-400/50 bg-gradient-to-br from-cyan-500/10 to-blue-500/10' 
+                  : 'border-slate-700/50 hover:border-cyan-400/30'
+              }`}
+            >
+              {service.highlight && (
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                  <div className="bg-cyan-400 text-slate-900 px-4 py-1 rounded-full text-xs font-bold">
+                    FEATURED
+                  </div>
+                </div>
+              )}
+              
+              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform ${
+                service.highlight 
+                  ? 'bg-gradient-to-br from-cyan-400 to-blue-500' 
+                  : 'bg-gradient-to-br from-slate-700 to-slate-600'
+              }`}>
+                <service.icon className="h-8 w-8 text-white" />
+              </div>
+              
+              <h3 className="text-xl font-bold mb-4 text-white group-hover:text-cyan-400 transition-colors">
+                {service.title}
+              </h3>
+              <p className="text-gray-300 leading-relaxed mb-6">
+                {service.desc}
+              </p>
+              <button className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors flex items-center space-x-2">
+                <span>Read More</span>
+                <span>→</span>
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+      <Footer/>
     </div>
   );
 }

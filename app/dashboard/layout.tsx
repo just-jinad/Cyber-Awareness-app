@@ -63,7 +63,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-y-auto p-6 md:ml-64 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-700 dark:scrollbar-track-gray-900">
+      <div className="fl">
         {/* Hamburger Menu for Mobile */}
         <div className="md:hidden mb-4">
           <Button
