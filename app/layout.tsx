@@ -17,6 +17,15 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: 'Cybersecurity Awareness Platform',
   description: 'A mini project for cybersecurity education',
+   icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/favicon-32x32.png', sizes: '32x32' },
+      { url: '/favicon-16x16.png', sizes: '16x16' },
+      { url: '/apple-touch-icon.png', rel: 'apple-touch-icon' },
+    ],
+  },
+  manifest: '/site.webmanifest',
 }
 
 export default function RootLayout({
