@@ -83,7 +83,7 @@ export default function DashboardHome() {
             <Download className="h-4 w-4 mr-2 inline" />
             Download
           </button>
-          <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+          <button className="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors">
             Add Filter
           </button>
         </div>
@@ -102,7 +102,7 @@ export default function DashboardHome() {
                   <span className="text-sm text-green-500">Learning Content</span>
                 </div>
               </div>
-              <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-cyan-600 rounded-full flex items-center justify-center">
                 <Activity className="h-6 w-6 text-white" />
               </div>
             </div>
@@ -237,7 +237,7 @@ export default function DashboardHome() {
                   </div>
                   <div className="w-full bg-gray-700 rounded-full h-2">
                     <div 
-                      className="bg-purple-600 h-2 rounded-full transition-all duration-300"
+                      className="bg-cyan-600 h-2 rounded-full transition-all duration-300"
                       style={{ width: `${country.percentage}%` }}
                     />
                   </div>
@@ -256,7 +256,7 @@ export default function DashboardHome() {
             <button className="px-3 py-1 bg-gray-700 text-white rounded-lg text-sm hover:bg-gray-600">
               Download
             </button>
-            <button className="px-3 py-1 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700">
+            <button className="px-3 py-1 bg-cyan-600 text-white rounded-lg text-sm hover:bg-cyan-700">
               Add Filter
             </button>
             <button className="p-2 hover:bg-gray-700 rounded-lg">
@@ -293,7 +293,7 @@ export default function DashboardHome() {
                     </td>
                     <td className="py-4 px-4">
                       <div className="flex items-center space-x-2">
-                        <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-xs text-white font-medium">
+                        <div className="w-8 h-8 bg-cyan-600 rounded-full flex items-center justify-center text-xs text-white font-medium">
                           {transaction.avatar}
                         </div>
                         <span className="text-sm text-gray-300">{transaction.user}</span>
@@ -301,7 +301,7 @@ export default function DashboardHome() {
                     </td>
                     <td className="py-4 px-4 text-sm text-white font-medium">{transaction.amount}</td>
                     <td className="py-4 px-4">
-                      <button className="text-purple-400 hover:text-purple-300 text-sm">
+                      <button className="text-cyan-400 hover:text-cyan-300 text-sm">
                         More
                       </button>
                     </td>

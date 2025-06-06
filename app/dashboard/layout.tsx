@@ -38,15 +38,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   ];
 
   return (
-    <div className="flex h-screen bg-gray-900 text-white overflow-hidden">
+    <div className="flex h-screen bg-[#111d3c] text-white overflow-hidden">
       {/* Sidebar */}
       <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-800 border-r border-gray-700 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:inset-0`}>
         <div className="flex items-center justify-between p-4 border-b border-gray-700">
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">A</span>
+            <div className="w-8 h-8 bg-cyan-500 hover:bg-cyan-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-sm">C</span>
             </div>
-            <span className="text-lg font-semibold">Apexify</span>
+            <span className="text-lg font-semibold">Cyberix</span>
           </div>
         </div>
         
@@ -58,7 +58,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               onClick={() => setIsSidebarOpen(false)}
               className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
                 pathname === item.path 
-                  ? 'bg-purple-600 text-white' 
+                  ? 'bg-cyan-500 text-white' 
                   : 'text-gray-300 hover:bg-gray-700 hover:text-white'
               }`}
             >
@@ -103,7 +103,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <input
                   type="text"
                   placeholder="Search or type a command"
-                  className="bg-gray-700 text-white pl-10 pr-4 py-2 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm w-64"
+                  className="bg-gray-700 text-white pl-10 pr-4 py-2 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-sm w-64"
                 />
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                   <kbd className="px-2 py-1 text-xs text-gray-400 bg-gray-600 rounded">⌘K</kbd>
@@ -129,7 +129,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
               {/* User Profile */}
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-cyan-600 rounded-full flex items-center justify-center">
                   <User className="h-4 w-4" />
                 </div>
               </div>

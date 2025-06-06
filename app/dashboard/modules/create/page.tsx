@@ -112,7 +112,7 @@ export default function CreateModule() {
                   <input
                     id="title"
                     type="text"
-                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors"
                     value={newModule.title}
                     onChange={e => setNewModule({ ...newModule, title: e.target.value })}
                     required
@@ -132,7 +132,7 @@ export default function CreateModule() {
                   <textarea
                     id="content"
                     rows={12}
-                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors resize-vertical"
+                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors resize-vertical"
                     value={newModule.content}
                     onChange={e => setNewModule({ ...newModule, content: e.target.value })}
                     required
@@ -191,7 +191,7 @@ export default function CreateModule() {
                   <Button
                     type="submit"
                     disabled={loading || !newModule.title.trim() || !newModule.content.trim()}
-                    className="flex-1 bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {loading ? (
                       <>

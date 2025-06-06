@@ -108,7 +108,7 @@ export default function ModulesList() {
           <p className="text-gray-400 mt-1">Manage your learning modules and educational content</p>
         </div>
         <Link href="/dashboard/modules/create">
-          <Button className="bg-purple-600 hover:bg-purple-700 text-white">
+          <Button className="bg-cyan-600 hover:bg-cyan-700 text-white">
             <Plus className="h-4 w-4 mr-2" />
             Add New Module
           </Button>
@@ -122,7 +122,7 @@ export default function ModulesList() {
           <input
             type="text"
             placeholder="Search modules..."
-            className="bg-gray-700 text-white pl-10 pr-4 py-2 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent w-full"
+            className="bg-gray-700 text-white pl-10 pr-4 py-2 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent w-full"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -153,7 +153,7 @@ export default function ModulesList() {
           </p>
           {!searchTerm && (
             <Link href="/dashboard/modules/create">
-              <Button className="bg-purple-600 hover:bg-purple-700 text-white">
+              <Button className="bg-cyan-600 hover:bg-cyan-700 text-white">
                 <Plus className="h-4 w-4 mr-2" />
                 Create First Module
               </Button>
@@ -172,7 +172,7 @@ export default function ModulesList() {
                     className="w-full h-48 object-cover rounded-t-lg"
                   />
                 ) : (
-                  <div className="w-full h-48 bg-gradient-to-br from-purple-600 to-blue-600 rounded-t-lg flex items-center justify-center">
+                  <div className="w-full h-48 bg-gradient-to-br from-cyan-600 to-blue-600 rounded-t-lg flex items-center justify-center">
                     <ImageIcon className="h-12 w-12 text-white opacity-50" />
                   </div>
                 )}
