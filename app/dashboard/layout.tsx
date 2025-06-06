@@ -3,7 +3,7 @@
 import { useSession, signOut } from 'next-auth/react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Book, Play, List, LogOut, Menu, Home } from 'lucide-react';
+import { Book, Play, List, LogOut, Menu, Home, Bell, Search, User, Settings, BarChart3, Filter, Calendar, Download, MoreHorizontal } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -13,77 +13,141 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
 
   if (status === 'loading') {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
   }
 
   if (!session?.user?.role || session.user.role !== 'ADMIN') {
-    return <div>Access Denied</div>;
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-white">Access Denied</div>
+      </div>
+    );
   }
 
   const navItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: Home },
+    { name: 'Overview', path: '/dashboard', icon: Home },
     { name: 'Modules', path: '/dashboard/modules', icon: Book },
     { name: 'Simulations', path: '/dashboard/simulations', icon: Play },
     { name: 'Quizzes', path: '/dashboard/quizzes', icon: List },
+    { name: 'Analytics', path: '/dashboard/analytics', icon: BarChart3 },
+    { name: 'Settings', path: '/dashboard/settings', icon: Settings },
   ];
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      {/* Side Navbar */}
-      <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-800 text-white md:static md:w-64 md:min-h-screen flex-shrink-0`}
-      >
-        <div className="p-4 border-b border-gray-700">
-          <h2 className="text-xl font-bold">Admin Dashboard</h2>
+    <div className="flex h-screen bg-gray-900 text-white overflow-hidden">
+      {/* Sidebar */}
+      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-800 border-r border-gray-700 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:inset-0`}>
+        <div className="flex items-center justify-between p-4 border-b border-gray-700">
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-sm">A</span>
+            </div>
+            <span className="text-lg font-semibold">Apexify</span>
+          </div>
         </div>
-        <nav className="flex flex-col p-2 space-y-2">
+        
+        <nav className="flex-1 px-3 py-4 space-y-1">
           {navItems.map((item) => (
             <Link
               key={item.name}
               href={item.path}
               onClick={() => setIsSidebarOpen(false)}
-              className={`flex items-center p-2 rounded-lg ${
-                pathname === item.path ? 'bg-gray-700' : 'hover:bg-gray-700'
+              className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                pathname === item.path 
+                  ? 'bg-purple-600 text-white' 
+                  : 'text-gray-300 hover:bg-gray-700 hover:text-white'
               }`}
-              aria-label={item.name}
             >
-              <item.icon className="mr-2" size={20} />
+              <item.icon className="mr-3 h-5 w-5" />
               {item.name}
             </Link>
           ))}
+        </nav>
+
+        <div className="p-3 border-t border-gray-700">
           <button
             onClick={() => signOut({ callbackUrl: '/auth/signin' })}
-            className="flex items-center p-2 rounded-lg hover:bg-gray-700 mt-auto"
-            aria-label="Logout"
+            className="flex items-center w-full px-3 py-2 text-sm font-medium text-gray-300 rounded-lg hover:bg-gray-700 hover:text-white transition-colors"
           >
-            <LogOut className="mr-2" size={20} />
+            <LogOut className="mr-3 h-5 w-5" />
             Logout
           </button>
-        </nav>
+        </div>
       </aside>
 
       {/* Main Content */}
-      <div className="fl">
-        {/* Hamburger Menu for Mobile */}
-        <div className="md:hidden mb-4">
-          <Button
-            variant="outline"
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            aria-label="Toggle Sidebar"
-          >
-            <Menu size={24} />
-          </Button>
-        </div>
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Top Header */}
+        <header className="bg-gray-800 border-b border-gray-700 px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                className="md:hidden text-gray-300 hover:text-white hover:bg-gray-700"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+              <h1 className="text-xl font-semibold">Dashboard</h1>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              {/* Search */}
+              <div className="relative hidden md:block">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <input
+                  type="text"
+                  placeholder="Search or type a command"
+                  className="bg-gray-700 text-white pl-10 pr-4 py-2 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm w-64"
+                />
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <kbd className="px-2 py-1 text-xs text-gray-400 bg-gray-600 rounded">⌘K</kbd>
+                </div>
+              </div>
 
-        {children}
+              {/* Date Range */}
+              <div className="hidden lg:flex items-center space-x-2 bg-gray-700 px-3 py-2 rounded-lg">
+                <Calendar className="h-4 w-4 text-gray-400" />
+                <span className="text-sm text-gray-300">23 May - 15 Nov, 2024</span>
+              </div>
+
+              {/* Filter */}
+              <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white hover:bg-gray-700">
+                <Filter className="h-4 w-4" />
+              </Button>
+
+              {/* Notifications */}
+              <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white hover:bg-gray-700 relative">
+                <Bell className="h-5 w-5" />
+                <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"></span>
+              </Button>
+
+              {/* User Profile */}
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
+                  <User className="h-4 w-4" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Main Content Area */}
+        <main className="flex-1 overflow-y-auto bg-gray-900 p-6">
+          {children}
+        </main>
       </div>
 
-      {/* Overlay for Mobile Sidebar */}
+      {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black opacity-50 md:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
           onClick={() => setIsSidebarOpen(false)}
-          aria-hidden="true"
         />
       )}
     </div>
