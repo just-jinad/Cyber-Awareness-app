@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { toast } from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ArrowLeft, Save, Eye, Plus, Minus, GitBranch, Play, Target } from 'lucide-react';
+import Link from 'next/link';
 
 interface Step {
   scenario: string;
@@ -21,14 +21,39 @@ export default function CreateSimulation() {
     title: '',
     steps: [{ scenario: '', options: ['', ''], nextStep: [null, null] as (number | null)[], outcomes: ['', ''] }],
   });
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleAddSimulation = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!newSimulation.title.trim()) {
+      toast.error('Please enter a simulation title');
+      return;
+    }
+
+    // Validate steps
+    for (let i = 0; i < newSimulation.steps.length; i++) {
+      const step = newSimulation.steps[i];
+      if (!step.scenario.trim()) {
+        toast.error(`Please enter a scenario for Step ${i + 1}`);
+        return;
+      }
+      for (let j = 0; j < step.options.length; j++) {
+        if (!step.options[j].trim()) {
+          toast.error(`Please enter Option ${j + 1} for Step ${i + 1}`);
+          return;
+        }
+      }
+    }
+
+    setLoading(true);
+
     const updatedSteps = newSimulation.steps.map(step => ({
       ...step,
       outcomes: step.options.map((_, idx) => step.outcomes?.[idx] || ''),
     }));
+
     try {
       const res = await fetch('/api/simulations', {
         method: 'POST',
@@ -44,6 +69,8 @@ export default function CreateSimulation() {
       }
     } catch (error) {
       toast.error('An error occurred while creating the simulation');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -146,147 +173,333 @@ export default function CreateSimulation() {
     updateStep(stepIndex, 'outcomes', updatedOutcomes);
   };
 
+  const getTotalOptions = () => {
+    return newSimulation.steps.reduce((total, step) => total + step.options.length, 0);
+  };
+
+  const getEndingPaths = () => {
+    return newSimulation.steps.reduce((total, step) => {
+      return total + step.nextStep.filter(next => next === null).length;
+    }, 0);
+  };
+
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Create New Simulation</h1>
-      <Card>
-        <CardHeader>
-          <CardTitle>Create Simulation</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleAddSimulation} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="title">Simulation Title</Label>
-              <Input
-                id="title"
-                value={newSimulation.title}
-                onChange={(e) => setNewSimulation({ ...newSimulation, title: e.target.value })}
-                placeholder="Enter simulation title"
-                required
-              />
-            </div>
-            {newSimulation.steps.map((step, stepIndex) => (
-              <div key={stepIndex} className="border rounded-lg p-4 space-y-4">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-xl font-semibold">Step {stepIndex + 1}</h3>
-                  {newSimulation.steps.length > 1 && (
-                    <Button variant="destructive" onClick={() => removeStep(stepIndex)} type="button">
-                      Remove Step
-                    </Button>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor={`scenario-${stepIndex}`}>Scenario</Label>
-                  <Input
-                    id={`scenario-${stepIndex}`}
-                    value={step.scenario}
-                    onChange={(e) => updateStep(stepIndex, 'scenario', e.target.value)}
-                    placeholder="Describe the scenario"
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center space-x-4">
+        <Link href="/dashboard/simulations">
+          <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white hover:bg-gray-700">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Simulations
+          </Button>
+        </Link>
+        <div>
+          <h1 className="text-2xl font-bold text-white">Create New Simulation</h1>
+          <p className="text-gray-400 mt-1">Build interactive decision-making scenarios</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main Form */}
+        <div className="lg:col-span-2">
+          <Card className="bg-gray-800 border-gray-700">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center">
+                <Save className="h-5 w-5 mr-2" />
+                Simulation Details
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleAddSimulation} className="space-y-6">
+                {/* Title Field */}
+                <div>
+                  <label htmlFor="title" className="block text-sm font-medium text-gray-300 mb-2">
+                    Simulation Title <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    id="title"
+                    type="text"
+                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors"
+                    value={newSimulation.title}
+                    onChange={(e) => setNewSimulation({ ...newSimulation, title: e.target.value })}
+                    placeholder="Enter a descriptive title for your simulation"
+                    maxLength={100}
                     required
                   />
+                  <div className="text-right text-xs text-gray-400 mt-1">
+                    {newSimulation.title.length}/100 characters
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <Label>Options</Label>
+
+                {/* Steps */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-sm font-medium text-gray-300">
+                      Simulation Steps <span className="text-red-400">*</span>
+                    </label>
                     <Button
                       type="button"
+                      onClick={addStep}
                       variant="outline"
-                      onClick={() => addOption(stepIndex)}
-                      className="text-sm"
+                      size="sm"
+                      className="border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
                     >
-                      Add Option
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Step
                     </Button>
                   </div>
-                  {step.options.map((option, optionIndex) => (
-                    <div key={optionIndex} className="flex flex-col space-y-2">
-                      <div className="flex items-center space-x-4">
-                        <Input
-                          value={option}
-                          onChange={(e) => updateOption(stepIndex, optionIndex, e.target.value)}
-                          placeholder={`Option ${optionIndex + 1}`}
-                          required
-                          className="flex-1"
-                        />
-                        <div className="flex items-center space-x-2">
-                          <Label>Next Step</Label>
-                          <Select
-                            value={
-                              step.nextStep[optionIndex] === null
-                                ? 'end'
-                                : newSimulation.steps.findIndex((_, idx) => idx === step.nextStep[optionIndex]) >
-                                    stepIndex + 1
-                                ? `future-step-${step.nextStep[optionIndex]}`
-                                : `next-step-${step.nextStep[optionIndex]}`
-                            }
-                            onValueChange={(value) => updateNextStep(stepIndex, optionIndex, value)}
-                          >
-                            <SelectTrigger className="w-40">
-                              <SelectValue placeholder="Select next step" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem key="end" value="end">
-                                End Simulation
-                              </SelectItem>
-                              {newSimulation.steps.map((_, idx) => {
-                                const nextStepNum = idx + 1;
-                                if (idx !== stepIndex && nextStepNum > stepIndex + 1) {
-                                  return (
-                                    <SelectItem
-                                      key={`future-step-${idx}`}
-                                      value={`future-step-${idx}`}
-                                    >
-                                      Step {nextStepNum}
-                                    </SelectItem>
-                                  );
-                                }
-                                return null;
-                              })}
-                              {stepIndex + 1 < newSimulation.steps.length && (
-                                <SelectItem
-                                  key={`next-in-sequence-${stepIndex}`}
-                                  value={`next-step-${stepIndex + 1}`}
-                                >
-                                  Step {stepIndex + 2} (Next in Sequence)
-                                </SelectItem>
-                              )}
-                            </SelectContent>
-                          </Select>
-                          <Button
+
+                  {newSimulation.steps.map((step, stepIndex) => (
+                    <div key={stepIndex} className="bg-gray-700 border border-gray-600 rounded-lg p-4 space-y-4">
+                      <div className="flex justify-between items-center">
+                        <h3 className="text-lg font-semibold text-white flex items-center">
+                          <GitBranch className="h-4 w-4 mr-2" />
+                          Step {stepIndex + 1}
+                        </h3>
+                        {newSimulation.steps.length > 1 && (
+                          <Button 
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeStep(stepIndex)} 
                             type="button"
-                            variant="destructive"
-                            onClick={() => removeOption(stepIndex, optionIndex)}
-                            className="text-sm"
-                            disabled={step.options.length <= 2}
+                            className="text-red-400 hover:text-red-300 hover:bg-red-400/10"
                           >
+                            <Minus className="h-4 w-4 mr-1" />
                             Remove
                           </Button>
-                        </div>
+                        )}
                       </div>
-                      {step.nextStep[optionIndex] === null && (
-                        <div className="space-y-2 ml-4">
-                          <Label htmlFor={`outcome-${stepIndex}-${optionIndex}`}>Outcome</Label>
-                          <Input
-                            id={`outcome-${stepIndex}-${optionIndex}`}
-                            value={step.outcomes?.[optionIndex] || ''}
-                            onChange={(e) => updateOutcome(stepIndex, optionIndex, e.target.value)}
-                            placeholder="e.g., 'success', 'neutral', 'breach'"
-                          />
+
+                      {/* Scenario */}
+                      <div>
+                        <label htmlFor={`scenario-${stepIndex}`} className="block text-sm font-medium text-gray-300 mb-2">
+                          Scenario Description <span className="text-red-400">*</span>
+                        </label>
+                        <textarea
+                          id={`scenario-${stepIndex}`}
+                          rows={3}
+                          className="w-full bg-gray-600 border border-gray-500 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors resize-vertical"
+                          value={step.scenario}
+                          onChange={(e) => updateStep(stepIndex, 'scenario', e.target.value)}
+                          placeholder="Describe the scenario users will encounter"
+                          required
+                        />
+                      </div>
+
+                      {/* Options */}
+                      <div>
+                        <div className="flex justify-between items-center mb-3">
+                          <label className="block text-sm font-medium text-gray-300">
+                            Decision Options <span className="text-red-400">*</span>
+                          </label>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => addOption(stepIndex)}
+                            className="border-gray-500 text-gray-300 hover:bg-gray-600 hover:text-white"
+                          >
+                            <Plus className="h-3 w-3 mr-1" />
+                            Add Option
+                          </Button>
                         </div>
-                      )}
+
+                        {step.options.map((option, optionIndex) => (
+                          <div key={optionIndex} className="bg-gray-600 border border-gray-500 rounded-lg p-3 mb-3 space-y-3">
+                            <div className="flex items-center space-x-3">
+                              <input
+                                type="text"
+                                className="flex-1 bg-gray-500 border border-gray-400 rounded px-3 py-2 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors"
+                                value={option}
+                                onChange={(e) => updateOption(stepIndex, optionIndex, e.target.value)}
+                                placeholder={`Option ${optionIndex + 1}`}
+                                required
+                              />
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeOption(stepIndex, optionIndex)}
+                                disabled={step.options.length <= 2}
+                                className="text-red-400 hover:text-red-300 hover:bg-red-400/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                <Minus className="h-4 w-4" />
+                              </Button>
+                            </div>
+
+                            <div className="flex items-center space-x-3">
+                              <label className="text-sm text-gray-300 whitespace-nowrap">Next Step:</label>
+                              <Select
+                                value={
+                                  step.nextStep[optionIndex] === null
+                                    ? 'end'
+                                    : newSimulation.steps.findIndex((_, idx) => idx === step.nextStep[optionIndex]) >
+                                        stepIndex + 1
+                                    ? `future-step-${step.nextStep[optionIndex]}`
+                                    : `next-step-${step.nextStep[optionIndex]}`
+                                }
+                                onValueChange={(value) => updateNextStep(stepIndex, optionIndex, value)}
+                              >
+                                <SelectTrigger className="bg-gray-500 border-gray-400 text-white">
+                                  <SelectValue placeholder="Select next step" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-gray-700 border-gray-600">
+                                  <SelectItem key="end" value="end" className="text-white hover:bg-gray-600">
+                                    End Simulation
+                                  </SelectItem>
+                                  {newSimulation.steps.map((_, idx) => {
+                                    const nextStepNum = idx + 1;
+                                    if (idx !== stepIndex && nextStepNum > stepIndex + 1) {
+                                      return (
+                                        <SelectItem
+                                          key={`future-step-${idx}`}
+                                          value={`future-step-${idx}`}
+                                          className="text-white hover:bg-gray-600"
+                                        >
+                                          Step {nextStepNum}
+                                        </SelectItem>
+                                      );
+                                    }
+                                    return null;
+                                  })}
+                                  {stepIndex + 1 < newSimulation.steps.length && (
+                                    <SelectItem
+                                      key={`next-in-sequence-${stepIndex}`}
+                                      value={`next-step-${stepIndex + 1}`}
+                                      className="text-white hover:bg-gray-600"
+                                    >
+                                      Step {stepIndex + 2} (Next in Sequence)
+                                    </SelectItem>
+                                  )}
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            {step.nextStep[optionIndex] === null && (
+                              <div>
+                                <label className="block text-sm text-gray-300 mb-1">
+                                  Outcome <span className="text-gray-500">(optional)</span>
+                                </label>
+                                <input
+                                  type="text"
+                                  className="w-full bg-gray-500 border border-gray-400 rounded px-3 py-2 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors"
+                                  value={step.outcomes?.[optionIndex] || ''}
+                                  onChange={(e) => updateOutcome(stepIndex, optionIndex, e.target.value)}
+                                  placeholder="e.g., 'success', 'neutral', 'breach'"
+                                />
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   ))}
                 </div>
+
+                {/* Action Buttons */}
+                <div className="flex space-x-4 pt-6">
+                  <Button
+                    type="submit"
+                    disabled={loading || !newSimulation.title.trim()}
+                    className="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Creating Simulation...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="h-4 w-4 mr-2" />
+                        Create Simulation
+                      </>
+                    )}
+                  </Button>
+                  <Link href="/dashboard/simulations">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      className="border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
+                      disabled={loading}
+                    >
+                      Cancel
+                    </Button>
+                  </Link>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Preview Sidebar */}
+        <div className="lg:col-span-1">
+          <Card className="bg-gray-800 border-gray-700 sticky top-6">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center">
+                <Eye className="h-5 w-5 mr-2" />
+                Preview
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {/* Simulation Overview */}
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-2 flex items-center">
+                    <Play className="h-4 w-4 mr-2" />
+                    {newSimulation.title || 'Simulation Title'}
+                  </h3>
+                  <p className="text-gray-400 text-sm">
+                    Interactive decision-making scenario with multiple paths and outcomes.
+                  </p>
+                </div>
+
+                {/* Simulation Stats */}
+                <div className="bg-gray-700 rounded-lg p-4 space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-400">Total Steps:</span>
+                    <span className="text-white">{newSimulation.steps.length}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-400">Total Options:</span>
+                    <span className="text-white">{getTotalOptions()}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-400">Ending Paths:</span>
+                    <span className="text-white">{getEndingPaths()}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-400">Title Length:</span>
+                    <span className="text-white">{newSimulation.title.length} chars</span>
+                  </div>
+                </div>
+
+                {/* Step Preview */}
+                {newSimulation.steps.length > 0 && (
+                  <div className="bg-gray-700 rounded-lg p-4">
+                    <div className="flex items-center mb-3">
+                      <Target className="h-4 w-4 mr-2 text-cyan-400" />
+                      <span className="text-sm font-medium text-gray-300">Current Steps</span>
+                    </div>
+                    <div className="space-y-2 max-h-40 overflow-y-auto">
+                      {newSimulation.steps.map((step, index) => (
+                        <div key={index} className="text-sm">
+                          <div className="text-white font-medium">Step {index + 1}</div>
+                          <div className="text-gray-400 truncate">
+                            {step.scenario || 'No scenario defined'}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {step.options.length} option{step.options.length !== 1 ? 's' : ''}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-            ))}
-            <div className="flex space-x-4">
-              <Button type="button" onClick={addStep} variant="outline">
-                Add Step
-              </Button>
-              <Button type="submit">Create Simulation</Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }
