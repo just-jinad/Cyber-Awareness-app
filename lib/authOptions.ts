@@ -1,11 +1,7 @@
-// lib/authOptions.ts
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-export const dynamic = 'force-dynamic';
-
-const prisma = new PrismaClient();
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -16,19 +12,21 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error('Missing credentials');
+        const prisma = new PrismaClient();
+        try {
+          if (!credentials?.email || !credentials?.password) {
+            throw new Error('Missing credentials');
+          }
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email },
+          });
+          if (!user || !(await bcrypt.compare(credentials.password, user.password))) {
+            throw new Error('Invalid email or password');
+          }
+          return { id: user.id, email: user.email, role: user.role, name: user.username };
+        } finally {
+          await prisma.$disconnect();
         }
-
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
-
-        if (!user || !(await bcrypt.compare(credentials.password, user.password))) {
-          throw new Error('Invalid email or password');
-        }
-
-        return { id: user.id, email: user.email, role: user.role, name: user.username };
       },
     }),
   ],
