@@ -1,6 +1,7 @@
 "use client"
 import React, { useState } from 'react';
 import { Shield, Menu, X } from 'lucide-react';
+import Link from 'next/link';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -21,19 +22,21 @@ const Navbar = () => {
           
           {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center space-x-8">
-            <a href="#" className="text-gray-300 hover:text-white transition-colors text-sm">Home</a>
-            <a href="#" className="text-gray-300 hover:text-white transition-colors text-sm">About</a>
-            <a href="#" className="text-gray-300 hover:text-white transition-colors text-sm">Services</a>
-            <a href="#" className="text-gray-300 hover:text-white transition-colors text-sm">Blog</a>
-            <a href="#" className="text-gray-300 hover:text-white transition-colors text-sm">Team</a>
-            <a href="#" className="text-gray-300 hover:text-white transition-colors text-sm">Pages</a>
-            <a href="#" className="text-gray-300 hover:text-white transition-colors text-sm">Contact</a>
+            <Link href="/" className="text-gray-300 hover:text-white transition-colors text-sm">Home</Link>
+            <Link href="/modules" className="text-gray-300 hover:text-white transition-colors text-sm">Modules</Link>
+            <Link href="/simulations" className="text-gray-300 hover:text-white transition-colors text-sm">Simulations</Link>
+            <Link href="#" className="text-gray-300 hover:text-white transition-colors text-sm">Quizzes</Link>
+            <Link href="#" className="text-gray-300 hover:text-white transition-colors text-sm">About</Link>
+            <Link href="#" className="text-gray-300 hover:text-white transition-colors text-sm">Contact</Link>
+            <Link href="/auth/signin" className="text-gray-300 hover:text-white transition-colors text-sm">Login</Link>
           </div>
           
           {/* Desktop CTA Button */}
-          <button className="hidden md:block bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-2 rounded-lg transition-colors text-sm font-medium">
-            Get Quote
+          <Link href="/auth/signup">
+          <button className="hidden cursor-pointer md:block bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-2 rounded-lg transition-colors text-sm font-medium">
+            Get started 
           </button>
+          </Link>
 
           {/* Mobile menu button */}
           <button
