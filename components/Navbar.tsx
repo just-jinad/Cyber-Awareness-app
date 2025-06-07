@@ -59,17 +59,19 @@ const Navbar = () => {
         isMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
       }`}>
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-slate-900/98 backdrop-blur-sm border-t border-slate-800">
-          <a href="#" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">Home</a>
-          <a href="#" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">About</a>
-          <a href="#" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">Services</a>
-          <a href="#" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">Blog</a>
-          <a href="#" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">Team</a>
-          <a href="#" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">Pages</a>
-          <a href="#" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">Contact</a>
+          <Link href="/" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">Home</Link>
+          <Link href="/modules" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">Modules</Link>
+          <Link href="/simulations" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">Simulations</Link>
+          <Link href="#" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">Quizzes</Link>
+          <Link href="#" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">About</Link>
+          <Link href="#" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">Contact</Link>
+          <Link href="/auth/signin" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">Login</Link>
           <div className="px-3 py-2">
+            <Link href="/auth/signup">
             <button className="w-full bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-2 rounded-lg transition-all duration-200 hover:scale-105">
-              Get Quote
+              Get started
             </button>
+            </Link>
           </div>
         </div>
       </div>
