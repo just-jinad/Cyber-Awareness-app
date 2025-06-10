@@ -3,14 +3,15 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model module {
   id           Int            @id @default(autoincrement())
   title        String
-  content      String         @db.LongText
+  content      String         
   createdAt    DateTime       @default(now())
   imageUrl     String?
   userprogress userprogress[]
@@ -79,12 +80,14 @@ model userprogress {
   moduleId    Int
   score       Int
   completedAt DateTime @default(now())
-  module      module   @relation(fields: [moduleId], references: [id], map: "UserProgress_moduleId_fkey")
-  user        user     @relation(fields: [userId], references: [id], map: "UserProgress_userId_fkey")
 
-  @@index([moduleId], map: "UserProgress_moduleId_fkey")
-  @@index([userId], map: "UserProgress_userId_fkey")
+  module module @relation(fields: [moduleId], references: [id])
+  user   user   @relation(fields: [userId], references: [id])
+
+  @@index([moduleId])
+  @@index([userId])
 }
+
 
 enum user_role {
   USER
