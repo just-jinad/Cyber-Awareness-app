@@ -10,16 +10,16 @@ cloudinary.config({
 
 export const uploadImage = async (file: File): Promise<string> => {
   const buffer = Buffer.from(await file.arrayBuffer());
-  // Ensure the temp directory exists
-  const tempDir = path.join(process.cwd(), 'tmp');
-  await fs.mkdir(tempDir, { recursive: true });
-  const tempFilePath = path.join(tempDir, `${Date.now()}-${file.name}`);
-  await fs.writeFile(tempFilePath, buffer);
 
-  const result = await cloudinary.uploader.upload(tempFilePath, {
-    folder: 'cybersecurity-modules',
+  const result: any = await new Promise((resolve, reject) => {
+    cloudinary.uploader.upload_stream(
+      { folder: 'cybersecurity-modules' },
+      (error, result) => {
+        if (error || !result) reject(error);
+        else resolve(result);
+      }
+    ).end(buffer);
   });
-  await fs.unlink(tempFilePath); // Clean up temp file
 
   return result.secure_url;
 };
