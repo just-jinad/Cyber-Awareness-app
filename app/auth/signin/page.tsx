@@ -39,7 +39,7 @@ export default function Signin() {
         router.push("/dashboard");
       } else {
         toast.success("Sign in successful!");
-        router.push("/");
+        router.push("/user-dashboard");
       }
     } else {
       toast.error("Invalid email or password");

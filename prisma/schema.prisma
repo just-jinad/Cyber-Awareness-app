@@ -69,7 +69,8 @@ model user {
   email        String         @unique(map: "User_email_key")
   password     String
   role         user_role      @default(USER)
-  createdAt    DateTime       @default(now())
+  level        String         @default("beginner") // Global status: beginner, intermediate, advanced
+  createdAt    DateTime       @default(now())     // For tracking sign-ups
   userprogress userprogress[]
   quizResults  QuizResult[]   // Added opposite relation for QuizResult
 }
@@ -80,6 +81,8 @@ model userprogress {
   moduleId    Int
   score       Int
   completedAt DateTime @default(now())
+  level       String   @default("beginner") // Module-specific level
+  status      String?  // e.g., "in-progress", "completed"
 
   module module @relation(fields: [moduleId], references: [id])
   user   user   @relation(fields: [userId], references: [id])
@@ -87,7 +90,6 @@ model userprogress {
   @@index([moduleId])
   @@index([userId])
 }
-
 
 enum user_role {
   USER

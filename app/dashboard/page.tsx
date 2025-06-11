@@ -2,13 +2,21 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { MoreHorizontal, TrendingUp, TrendingDown, Download, Users, Globe, Activity, Eye } from 'lucide-react';
+import { MoreHorizontal, TrendingUp, Download, Users, Globe, Activity, Eye, Trash2 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, AreaChart, Area } from 'recharts';
 
 interface Metrics {
   totalModules: number;
   totalSimulations: number;
   totalQuizzes: number;
+}
+
+interface User {
+  id: number;
+  username: string;
+  level: string;
+  createdAt: string;
+  role?: 'USER' | 'ADMIN';
 }
 
 const analyticsData = [
@@ -34,15 +42,12 @@ const countryData = [
   { country: 'France', percentage: 8, flag: '🇫🇷' }
 ];
 
-const transactionData = [
-  { id: 'TRX A', amount: '$46,513.23', date: 'Dec 13, 2023', status: 'Processing', user: 'Chris Ryan', avatar: 'CR' },
-  { id: 'MTCH', amount: '$12,645.89', date: 'Dec 12, 2023', status: 'Success', user: 'Jessee Barron', avatar: 'JB' },
-  { id: 'OODS', amount: '$45,513.23', date: 'Dec 11, 2023', status: 'Success', user: 'Luke Barron', avatar: 'LB' },
-  { id: 'JAROS', amount: '$12,645.89', date: 'Dec 10, 2023', status: 'Success', user: 'Jack Nicholson', avatar: 'JN' }
-];
-
 export default function DashboardHome() {
   const [metrics, setMetrics] = useState<Metrics>({ totalModules: 0, totalSimulations: 0, totalQuizzes: 0 });
+  const [users, setUsers] = useState<User[]>([]);
+  const [levelCounts, setLevelCounts] = useState<{ [key: string]: number }>({ beginner: 0, intermediate: 0, advanced: 0 });
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 10;
 
   useEffect(() => {
     const fetchMetrics = async () => {
@@ -67,8 +72,76 @@ export default function DashboardHome() {
       }
     };
 
+    const fetchUsers = async () => {
+      try {
+        const res = await fetch('/api/users');
+        const data = await res.json();
+        setUsers(Array.isArray(data) ? data : []);
+        
+        const counts = data.reduce((acc: { [key: string]: number }, user: User) => {
+          acc[user.level] = (acc[user.level] || 0) + 1;
+          return acc;
+        }, { beginner: 0, intermediate: 0, advanced: 0 });
+        setLevelCounts(counts);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    };
+
     fetchMetrics();
+    fetchUsers();
   }, []);
+
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
+  const totalPages = Math.ceil(users.length / usersPerPage);
+
+  const handleDelete = async (userId: number) => {
+    if (confirm('Are you sure you want to delete this user?')) {
+      try {
+        const res = await fetch('/api/users', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: userId }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setUsers(users.filter(user => user.id !== userId));
+          const userLevel = users.find(u => u.id === userId)?.level || 'beginner';
+          setLevelCounts(prev => {
+            const newCounts = { ...prev };
+            newCounts[userLevel] = Math.max(0, newCounts[userLevel] - 1);
+            return newCounts;
+          });
+        } else {
+          console.error(data.error);
+        }
+      } catch (error) {
+        console.error('Error deleting user:', error);
+      }
+    }
+  };
+
+  const handleRoleUpdate = async (userId: number, newRole: 'USER' | 'ADMIN') => {
+    try {
+      const res = await fetch('/api/users', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: userId, role: newRole }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setUsers(users.map(user =>
+          user.id === userId ? { ...user, role: newRole } : user
+        ));
+      } else {
+        console.error(data.error);
+      }
+    } catch (error) {
+      console.error('Error updating role:', error);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -90,7 +163,7 @@ export default function DashboardHome() {
       </div>
 
       {/* Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <Card className="bg-gray-800 border-gray-700">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -158,6 +231,26 @@ export default function DashboardHome() {
               </div>
               <div className="w-12 h-12 bg-orange-600 rounded-full flex items-center justify-center">
                 <Eye className="h-6 w-6 text-white" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Progress Overview */}
+        <Card className="bg-gray-800 border-gray-700">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-400">User Levels</p>
+                <p className="text-3xl font-bold text-white">Total: {users.length}</p>
+                <div className="mt-2 space-y-1">
+                  <p className="text-sm text-gray-300">Beginner: {levelCounts.beginner}</p>
+                  <p className="text-sm text-gray-300">Intermediate: {levelCounts.intermediate}</p>
+                  <p className="text-sm text-gray-300">Advanced: {levelCounts.advanced}</p>
+                </div>
+              </div>
+              <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center">
+                <Users className="h-6 w-6 text-white" />
               </div>
             </div>
           </CardContent>
@@ -248,10 +341,10 @@ export default function DashboardHome() {
         </Card>
       </div>
 
-      {/* Transaction History */}
+      {/* User List */}
       <Card className="bg-gray-800 border-gray-700">
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-white">Transaction History</CardTitle>
+          <CardTitle className="text-white">User List</CardTitle>
           <div className="flex items-center space-x-2">
             <button className="px-3 py-1 bg-gray-700 text-white rounded-lg text-sm hover:bg-gray-600">
               Download
@@ -269,51 +362,64 @@ export default function DashboardHome() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-700">
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Order ID</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Date</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Status</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Account</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Amount</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Username</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Level</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Sign-up Date</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Role</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Action</th>
                 </tr>
               </thead>
               <tbody>
-                {transactionData.map((transaction, index) => (
-                  <tr key={transaction.id} className="border-b border-gray-700 hover:bg-gray-750">
-                    <td className="py-4 px-4 text-sm text-white">{transaction.id}</td>
-                    <td className="py-4 px-4 text-sm text-gray-300">{transaction.date}</td>
-                    <td className="py-4 px-4">
-                      <span className={`px-2 py-1 rounded-full text-xs ${
-                        transaction.status === 'Success' 
-                          ? 'bg-green-600 text-green-100' 
-                          : 'bg-yellow-600 text-yellow-100'
-                      }`}>
-                        {transaction.status}
-                      </span>
+                {currentUsers.map((user, index) => (
+                  <tr key={user.id} className="border-b border-gray-700 hover:bg-gray-750">
+                    <td className="py-4 px-4 text-sm text-white">{user.username}</td>
+                    <td className="py-4 px-4 text-sm text-gray-300">{user.level}</td>
+                    <td className="py-4 px-4 text-sm text-gray-300">{new Date(user.createdAt).toLocaleDateString()}</td>
+                    <td className="py-4 px-4 text-sm text-gray-300">
+                      {user.role || 'USER'}
                     </td>
-                    <td className="py-4 px-4">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-8 h-8 bg-cyan-600 rounded-full flex items-center justify-center text-xs text-white font-medium">
-                          {transaction.avatar}
-                        </div>
-                        <span className="text-sm text-gray-300">{transaction.user}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 px-4 text-sm text-white font-medium">{transaction.amount}</td>
-                    <td className="py-4 px-4">
-                      <button className="text-cyan-400 hover:text-cyan-300 text-sm">
-                        More
+                    <td className="py-4 px-4 flex space-x-2">
+                      <button
+                        onClick={() => handleDelete(user.id)}
+                        className="text-red-400 hover:text-red-300 text-sm"
+                      >
+                        <Trash2 className="h-4 w-4" />
                       </button>
+                      <select
+                        value={user.role || 'USER'}
+                        onChange={(e) => handleRoleUpdate(user.id, e.target.value as 'USER' | 'ADMIN')}
+                        className="bg-gray-700 text-white rounded px-2 py-1 text-sm"
+                      >
+                        <option value="USER">User</option>
+                        <option value="ADMIN">Admin</option>
+                      </select>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            <div className="flex justify-between mt-4">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 bg-gray-700 text-white rounded-lg disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <span className="text-sm text-gray-400">
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage(prev => (prev < totalPages ? prev + 1 : prev))}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 bg-gray-700 text-white rounded-lg disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
           </div>
         </CardContent>
       </Card>
-
-
     </div>
   );
 }

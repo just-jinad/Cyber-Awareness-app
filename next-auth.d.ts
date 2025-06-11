@@ -1,3 +1,4 @@
+// types/next-auth.d.ts (or wherever you have your type declarations)
 import NextAuth, { DefaultSession, DefaultUser } from "next-auth";
 
 declare module "next-auth" {
@@ -19,6 +20,6 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   interface JWT {
     role?: "USER" | "ADMIN";
-    id?: number;
+    id?: string; // Keep as string in JWT
   }
 }
