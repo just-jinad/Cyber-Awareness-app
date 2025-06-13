@@ -19,6 +19,13 @@ interface User {
   role?: 'USER' | 'ADMIN';
 }
 
+interface UserProgress {
+  userId: number; // Ensure this is included in the API response
+  level: string;
+  progress: number;
+  modules: { title: string; level: string; status: string; score: number }[];
+}
+
 const analyticsData = [
   { name: 'Jan', value: 20000, secondary: 15000 },
   { name: 'Feb', value: 25000, secondary: 18000 },
@@ -31,7 +38,7 @@ const analyticsData = [
   { name: 'Sep', value: 45000, secondary: 38000 },
   { name: 'Oct', value: 48000, secondary: 40000 },
   { name: 'Nov', value: 52000, secondary: 45000 },
-  { name: 'Dec', value: 55000, secondary: 48000 }
+  { name: 'Dec', value: 55000, secondary: 48000 },
 ];
 
 const countryData = [
@@ -39,7 +46,7 @@ const countryData = [
   { country: 'Canada', percentage: 20, flag: '🇨🇦' },
   { country: 'Germany', percentage: 15, flag: '🇩🇪' },
   { country: 'United Kingdom', percentage: 10, flag: '🇬🇧' },
-  { country: 'France', percentage: 8, flag: '🇫🇷' }
+  { country: 'France', percentage: 8, flag: '🇫🇷' },
 ];
 
 export default function DashboardHome() {
@@ -47,6 +54,7 @@ export default function DashboardHome() {
   const [users, setUsers] = useState<User[]>([]);
   const [levelCounts, setLevelCounts] = useState<{ [key: string]: number }>({ beginner: 0, intermediate: 0, advanced: 0 });
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedUserProgress, setSelectedUserProgress] = useState<UserProgress | null>(null);
   const usersPerPage = 10;
 
   useEffect(() => {
@@ -143,6 +151,24 @@ export default function DashboardHome() {
     }
   };
 
+  const fetchUserProgress = async (userId: number) => {
+    try {
+      const res = await fetch(`/api/user-progress?userId=${userId}`);
+      const data = await res.json();
+      if (res.ok && data) {
+        // Ensure userId is included in the response
+        const progressWithUserId: UserProgress = { ...data, userId };
+        setSelectedUserProgress(progressWithUserId);
+      } else {
+        setSelectedUserProgress(null);
+        console.warn('No progress data or invalid response:', data);
+      }
+    } catch (error) {
+      console.error('Error fetching user progress:', error);
+      setSelectedUserProgress(null);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -236,7 +262,6 @@ export default function DashboardHome() {
           </CardContent>
         </Card>
 
-        {/* Progress Overview */}
         <Card className="bg-gray-800 border-gray-700">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -341,6 +366,33 @@ export default function DashboardHome() {
         </Card>
       </div>
 
+      {/* User Progress */}
+      {selectedUserProgress && (
+        <Card className="bg-gray-800 border-gray-700">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-white">Progress for {users.find(u => u.id === selectedUserProgress.userId)?.username || 'Unknown User'}</CardTitle>
+            <button
+              onClick={() => setSelectedUserProgress(null)}
+              className="p-2 hover:bg-gray-700 rounded-lg"
+            >
+              <MoreHorizontal className="h-4 w-4 text-gray-400" />
+            </button>
+          </CardHeader>
+          <CardContent>
+            <p className="text-lg text-gray-300">Level: {selectedUserProgress.level}</p>
+            <p className="text-lg text-gray-300">Progress: {selectedUserProgress.progress.toFixed(2)}%</p>
+            <h3 className="text-lg font-semibold mt-4">Completed Modules:</h3>
+            <ul className="space-y-2">
+              {selectedUserProgress.modules.map((module, index) => (
+                <li key={index} className="text-lg text-gray-300">
+                  {module.title} - Status: {module.status}, Score: {module.score}
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
+
       {/* User List */}
       <Card className="bg-gray-800 border-gray-700">
         <CardHeader className="flex flex-row items-center justify-between">
@@ -367,6 +419,7 @@ export default function DashboardHome() {
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Sign-up Date</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Role</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Action</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Progress</th>
                 </tr>
               </thead>
               <tbody>
@@ -393,6 +446,14 @@ export default function DashboardHome() {
                         <option value="USER">User</option>
                         <option value="ADMIN">Admin</option>
                       </select>
+                    </td>
+                    <td className="py-4 px-4">
+                      <button
+                        onClick={() => fetchUserProgress(user.id)}
+                        className="px-2 py-1 bg-cyan-600 text-white rounded-lg text-sm hover:bg-cyan-700"
+                      >
+                        View Progress
+                      </button>
                     </td>
                   </tr>
                 ))}

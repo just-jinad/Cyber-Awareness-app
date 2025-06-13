@@ -8,25 +8,26 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model module {
+model Module {
   id           Int            @id @default(autoincrement())
   title        String
   content      String         
   createdAt    DateTime       @default(now())
   imageUrl     String?
-  userprogress userprogress[]
-  quizzes      Quiz[]         // Added opposite relation for Quiz
+  userprogress UserProgress[]
+  quizzes      Quiz[]
 }
 
 model Quiz {
   id        Int        @id @default(autoincrement())
   title     String
   type      String     // "public", "module-linked", "pin-protected"
-  pin       String?    // Optional pin for pin-protected quizzes
-  moduleId  Int?       // For module-linked quizzes
-  module    module?    @relation(fields: [moduleId], references: [id])
+  pin       String?
+  moduleId  Int?
+  module    Module?    @relation(fields: [moduleId], references: [id])
   questions Question[]
   results   QuizResult[]
+  progress  UserProgress[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 }
@@ -35,12 +36,12 @@ model Question {
   id        Int      @id @default(autoincrement())
   quizId    Int
   quiz      Quiz     @relation(fields: [quizId], references: [id])
-  type      String   // "multiple-choice", "true-false", "scenario-based"
+  type      String
   text      String
-  options   Json     // Changed from String[] to Json for MySQL compatibility
-  correct   String   // Correct answer (text of the correct option or "true"/"false")
-  score     Int      // Points for correct answer
-  feedback  String?  // Explanation for the correct answer
+  options   Json
+  correct   String
+  score     Int
+  feedback  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -48,50 +49,79 @@ model Question {
 model QuizResult {
   id        Int      @id @default(autoincrement())
   userId    Int?
-  user      user?    @relation(fields: [userId], references: [id])
+  user      User?    @relation(fields: [userId], references: [id])
   quizId    Int
   quiz      Quiz     @relation(fields: [quizId], references: [id])
   score     Int
-  answers   Json     // Store user answers as { questionId: answer }
+  answers   Json
   createdAt DateTime @default(now())
 }
 
 model Simulation {
-  id            Int      @id @default(autoincrement())
-  title         String
-  steps         Json?    // e.g., [{ scenario: "Email from hr-support@company-careers.com", options: ["Click link", "Report"], nextStep: [1, null] }, { scenario: "Fake login page", options: ["Enter credentials", "Close"], outcome: "breach" }]
-  createdAt     DateTime @default(now())
-}
-
-model user {
   id           Int            @id @default(autoincrement())
-  username     String         @unique(map: "User_username_key")
-  email        String         @unique(map: "User_email_key")
-  password     String
-  role         user_role      @default(USER)
-  level        String         @default("beginner") // Global status: beginner, intermediate, advanced
-  createdAt    DateTime       @default(now())     // For tracking sign-ups
-  userprogress userprogress[]
-  quizResults  QuizResult[]   // Added opposite relation for QuizResult
+  title        String
+  steps        Json?
+  createdAt    DateTime       @default(now())
+  userprogress UserProgress[]
 }
 
-model userprogress {
-  id          Int      @id @default(autoincrement())
-  userId      Int
-  moduleId    Int
-  score       Int
-  completedAt DateTime @default(now())
-  level       String   @default("beginner") // Module-specific level
-  status      String?  // e.g., "in-progress", "completed"
+model User {
+  id                Int            @id @default(autoincrement())
+  username          String         @unique(map: "User_username_key")
+  email             String         @unique(map: "User_email_key")
+  password          String
+  role              UserRole       @default(USER)
+  level             String         @default("beginner")
+  createdAt         DateTime       @default(now())
+  userprogress      UserProgress[]
+  quizResults       QuizResult[]
 
-  module module @relation(fields: [moduleId], references: [id])
-  user   user   @relation(fields: [userId], references: [id])
+  // ✅ Explicitly named relations
+  assignments        Assignment[] @relation("UserAssignments")
+  assignedByUsers    Assignment[] @relation("AdminAssignments")
+}
+
+model UserProgress {
+  id           Int       @id @default(autoincrement())
+  userId       Int
+  moduleId     Int?
+  simulationId Int?
+  quizId       Int?
+  score        Int
+  completedAt  DateTime  @default(now())
+  level        String    @default("beginner")
+  status       String?
+  timeTaken    Float     @default(0)
+
+  module       Module?     @relation(fields: [moduleId], references: [id])
+  simulation   Simulation? @relation(fields: [simulationId], references: [id])
+  quiz         Quiz?       @relation(fields: [quizId], references: [id])
+  user         User        @relation(fields: [userId], references: [id])
 
   @@index([moduleId])
+  @@index([simulationId])
+  @@index([quizId])
   @@index([userId])
 }
 
-enum user_role {
+model Assignment {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  contentId   Int
+  contentType String
+  assignedBy  Int
+  assignedAt  DateTime @default(now())
+  status      String   @default("pending")
+
+  // ✅ Match relation names here
+  user        User     @relation("UserAssignments", fields: [userId], references: [id])
+  admin       User     @relation("AdminAssignments", fields: [assignedBy], references: [id])
+
+  @@index([userId])
+  @@index([contentId])
+}
+
+enum UserRole {
   USER
   ADMIN
 }
