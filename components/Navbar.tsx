@@ -26,8 +26,8 @@ const Navbar = () => {
             <Link href="/modules" className="text-gray-300 hover:text-white transition-colors text-sm">Modules</Link>
             <Link href="/simulations" className="text-gray-300 hover:text-white transition-colors text-sm">Simulations</Link>
             <Link href="#" className="text-gray-300 hover:text-white transition-colors text-sm">Quizzes</Link>
-            <Link href="#" className="text-gray-300 hover:text-white transition-colors text-sm">About</Link>
-            <Link href="#" className="text-gray-300 hover:text-white transition-colors text-sm">Contact</Link>
+            <Link href="/About" className="text-gray-300 hover:text-white transition-colors text-sm">About</Link>
+            <Link href="/Contact" className="text-gray-300 hover:text-white transition-colors text-sm">Contact</Link>
             <Link href="/auth/signin" className="text-gray-300 hover:text-white transition-colors text-sm">Login</Link>
           </div>
           
@@ -63,8 +63,8 @@ const Navbar = () => {
           <Link href="/modules" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">Modules</Link>
           <Link href="/simulations" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">Simulations</Link>
           <Link href="#" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">Quizzes</Link>
-          <Link href="#" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">About</Link>
-          <Link href="#" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">Contact</Link>
+          <Link href="/About" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">About</Link>
+          <Link href="/Contact" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">Contact</Link>
           <Link href="/auth/signin" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">Login</Link>
           <div className="px-3 py-2">
             <Link href="/auth/signup">

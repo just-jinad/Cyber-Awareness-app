@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Lock, Monitor, Shield, Star, Database, Eye, Zap, Users, Award } from 'lucide-react';
+import { Lock, Monitor, Shield, Star, Database, Eye, Zap, Users, Award, BookOpen, TrendingUp } from 'lucide-react';
 
 export default function Home() {
- return (
+  return (
     <div className="min-h-screen bg-slate-900 text-white relative overflow-hidden">
       {/* Navbar */}
       <Navbar />
@@ -35,24 +35,27 @@ export default function Home() {
           <div className="space-y-8">
             <div className="space-y-6">
               <h1 className="text-4xl lg:text-6xl font-bold leading-tight">
-                We Help To Modern{' '}
+                Empower Your{' '}
                 <span className="text-cyan-400">
-                  Information
-                </span>{' '}
-                From Hackers.
+                  Cybersecurity Knowledge
+                </span>
               </h1>
               <p className="text-lg text-gray-300 leading-relaxed max-w-lg">
-                Protecting your business with comprehensive cybersecurity solutions, advanced threat detection, and expert security monitoring services around the clock.
+                Learn to protect yourself from cyber threats with our interactive Cybersecurity Awareness Platform. Master safe online practices through engaging modules, real-world simulations, and personalized learning paths.
               </p>
             </div>
             
             <div className="flex flex-col sm:flex-row gap-4">
-              <button className="bg-cyan-500 hover:bg-cyan-600 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300">
-                Get Protected Now
-              </button>
-              <button className="border border-gray-600 hover:border-gray-500 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300 hover:bg-white/5">
-                Learn More
-              </button>
+              <Link href="/start-learning">
+                <button className="bg-cyan-500 hover:bg-cyan-600 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300">
+                  Start Learning Now
+                </button>
+              </Link>
+              <Link href="/about">
+                <button className="border border-gray-600 hover:border-gray-500 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300 hover:bg-white/5">
+                  Learn More
+                </button>
+              </Link>
             </div>
           </div>
 
@@ -108,19 +111,18 @@ export default function Home() {
       <div className="bg-slate-800/30 backdrop-blur-none border-y border-slate-700/50 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
-            <p className="text-gray-400 text-sm">Our Clients & Partners</p>
+            <p className="text-gray-400 text-sm">Trusted by Educational Institutions</p>
           </div>
           <div className="flex justify-center items-center space-x-16 opacity-60">
-            <div className="text-gray-400 font-bold text-xl">Spotify</div>
-            <div className="text-gray-400 font-bold text-xl">Amazon</div>
-            <div className="text-gray-400 font-bold text-xl">FedEx</div>
-            <div className="text-gray-400 font-bold text-xl">Google</div>
-            <div className="text-gray-400 font-bold text-xl">Microsoft</div>
+            <div className="text-gray-400 font-bold text-xl">SQI College of ICT</div>
+            <div className="text-gray-400 font-bold text-xl">University of Lagos</div>
+            <div className="text-gray-400 font-bold text-xl">Ogun State Polytechnic</div>
+            <div className="text-gray-400 font-bold text-xl">Nigerian IT Association</div>
           </div>
         </div>
       </div>
 
-      {/* Security Platform Section */}
+      {/* Learning Platform Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Left Visual - Dashboard */}
@@ -132,44 +134,44 @@ export default function Home() {
                   <Shield className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <div className="text-white font-semibold">Security Dashboard</div>
-                  <div className="text-gray-400 text-sm">Real-time monitoring</div>
+                  <div className="text-white font-semibold">Learning Dashboard</div>
+                  <div className="text-gray-400 text-sm">Track your progress</div>
                 </div>
               </div>
               
-              {/* Security metrics grid */}
+              {/* Learning metrics grid */}
               <div className="grid grid-cols-3 gap-4">
                 <div className="bg-slate-900/60 rounded-lg p-4 border border-slate-600/30">
-                  <Database className="h-6 w-6 text-cyan-400 mb-2" />
-                  <div className="text-xs text-gray-400">Data Security</div>
-                  <div className="text-sm font-semibold text-white">98.5%</div>
+                  <BookOpen className="h-6 w-6 text-cyan-400 mb-2" />
+                  <div className="text-xs text-gray-400">Modules Completed</div>
+                  <div className="text-sm font-semibold text-white">12/15</div>
                 </div>
                 <div className="bg-slate-900/60 rounded-lg p-4 border border-slate-600/30">
                   <Eye className="h-6 w-6 text-blue-400 mb-2" />
-                  <div className="text-xs text-gray-400">Monitoring</div>
-                  <div className="text-sm font-semibold text-white">24/7</div>
+                  <div className="text-xs text-gray-400">Quizzes Taken</div>
+                  <div className="text-sm font-semibold text-white">8/10</div>
                 </div>
                 <div className="bg-slate-900/60 rounded-lg p-4 border border-slate-600/30">
-                  <Zap className="h-6 w-6 text-yellow-400 mb-2" />
-                  <div className="text-xs text-gray-400">Response</div>
-                  <div className="text-sm font-semibold text-white">&lt;5min</div>
+                  <Award className="h-6 w-6 text-yellow-400 mb-2" />
+                  <div className="text-xs text-gray-400">Certificates Earned</div>
+                  <div className="text-sm font-semibold text-white">3</div>
                 </div>
               </div>
               
               {/* Status indicators */}
               <div className="mt-6 space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-300">Threat Detection</span>
+                  <span className="text-sm text-gray-300">Phishing Training</span>
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                    <span className="text-xs text-green-400">Active</span>
+                    <span className="text-xs text-green-400">Completed</span>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-300">Firewall Status</span>
+                  <span className="text-sm text-gray-300">Malware Awareness</span>
                   <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                    <span className="text-xs text-green-400">Protected</span>
+                    <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                    <span className="text-xs text-yellow-400">In Progress</span>
                   </div>
                 </div>
               </div>
@@ -180,22 +182,22 @@ export default function Home() {
           <div className="space-y-8">
             <div>
               <h2 className="text-4xl lg:text-5xl font-bold mb-6">
-                Single Platform to Manage{' '}
+                Learn Cybersecurity with{' '}
                 <span className="text-cyan-400">
-                  Your Security & Compliance
+                  Interactive Modules
                 </span>
               </h2>
               <p className="text-lg text-gray-300 leading-relaxed">
-                Comprehensive cybersecurity management through a unified dashboard. Monitor threats, manage compliance, and respond to incidents all from one powerful platform.
+                Our platform offers a unified learning experience with engaging modules, real-world simulations, and progress tracking to help you master cybersecurity skills and stay safe online.
               </p>
             </div>
             
             <div className="space-y-4">
               {[
-                'Advanced Threat Detection & Prevention',
-                'Real-time Security Monitoring',
-                'Automated Compliance Reporting',
-                'Rapid Incident Response System'
+                'Interactive Phishing Simulations',
+                'Personalized Learning Paths',
+                'Real-time Progress Tracking',
+                'Certificates for Skill Mastery'
               ].map((feature, i) => (
                 <div key={i} className="flex items-center space-x-3">
                   <div className="w-5 h-5 bg-green-400 rounded-full flex items-center justify-center flex-shrink-0">
@@ -206,10 +208,118 @@ export default function Home() {
               ))}
             </div>
             
-            <button className="bg-cyan-500 hover:bg-cyan-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
-              Learn More About Platform
-            </button>
+            <Link href="/platform">
+              <button className="bg-cyan-500 hover:bg-cyan-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+                Explore the Platform
+              </button>
+            </Link>
           </div>
+        </div>
+      </div>
+
+      {/* Interactive Learning Approach Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl lg:text-5xl font-bold mb-4">
+            Master Cybersecurity with{' '}
+            <span className="text-cyan-400">
+              Hands-On Learning
+            </span>
+          </h2>
+          <p className="text-lg text-gray-300 leading-relaxed max-w-3xl mx-auto">
+            Our platform uses interactive simulations, gamified quizzes, and real-world scenarios to make learning cybersecurity engaging and effective, helping you recognize and respond to threats like phishing and malware.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {[
+            {
+              icon: BookOpen,
+              title: 'Engaging Modules',
+              desc: 'Learn through structured, easy-to-digest lessons on phishing, password security, malware, and more.'
+            },
+            {
+              icon: Zap,
+              title: 'Real-World Simulations',
+              desc: 'Practice identifying cyber threats with realistic scenarios, such as spotting phishing emails or securing devices.'
+            },
+            {
+              icon: Award,
+              title: 'Gamified Quizzes',
+              desc: 'Test your knowledge with fun, interactive quizzes that reward progress with badges and certificates.'
+            }
+          ].map((feature, i) => (
+            <div
+              key={i}
+              className="relative bg-slate-800/50 backdrop-blur-none rounded-2xl p-8 border border-slate-700/50 transition-all duration-300 group hover:transform hover:scale-105"
+            >
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform bg-gradient-to-br from-slate-700 to-slate-600">
+                <feature.icon className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-white group-hover:text-cyan-400 transition-colors">
+                {feature.title}
+              </h3>
+              <p className="text-gray-300 leading-relaxed mb-6">
+                {feature.desc}
+              </p>
+              <Link href="/features">
+                <button className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors flex items-center space-x-2">
+                  <span>Learn More</span>
+                  <span>→</span>
+                </button>
+              </Link>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Success Stories Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl lg:text-5xl font-bold mb-4">
+            Success Stories from{' '}
+            <span className="text-cyan-400">
+              Our Learners
+            </span>
+          </h2>
+          <p className="text-lg text-gray-300 leading-relaxed max-w-3xl mx-auto">
+            Hear from students and professionals who have transformed their cybersecurity skills with our platform, empowering them to stay safe in the digital world.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {[
+            {
+              name: 'Aisha K., Student',
+              quote: 'The phishing simulations helped me spot suspicious emails in real life. I feel confident protecting my data now!',
+              icon: Users
+            },
+            {
+              name: 'Chinedu O., IT Professional',
+              quote: 'The platform’s interactive modules made learning cybersecurity fun and practical. I earned my first certificate in a week!',
+              icon: Award
+            },
+            {
+              name: 'Fatima L., Educator',
+              quote: 'This platform transformed how I teach cybersecurity to my students. The gamified quizzes keep them engaged!',
+              icon: TrendingUp
+            }
+          ].map((story, i) => (
+            <div
+              key={i}
+              className="relative bg-slate-800/50 backdrop-blur-none rounded-2xl p-8 border border-slate-700/50 transition-all duration-300 group hover:transform hover:scale-105"
+            >
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform bg-gradient-to-br from-slate-700 to-slate-600">
+                <story.icon className="h-8 w-8 text-white" />
+              </div>
+              <p className="text-gray-300 leading-relaxed mb-6 italic">
+                "{story.quote}"
+              </p>
+              <h3 className="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors">
+                {story.name}
+              </h3>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -217,48 +327,48 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center mb-16">
           <h2 className="text-4xl lg:text-5xl font-bold mb-4">
-            We provide best-in-class{' '}
+            Comprehensive{' '}
             <span className="text-cyan-400">
-              Information
+              Cybersecurity Education
             </span>
           </h2>
           <h3 className="text-3xl lg:text-4xl font-bold text-cyan-400">
-            Investigation Security
+            For All Skill Levels
           </h3>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {[
             { 
-              icon: Shield, 
-              title: 'Network Security', 
-              desc: 'Advanced firewall protection and intrusion detection systems to safeguard your network infrastructure.',
+              icon: BookOpen, 
+              title: 'Learning Modules', 
+              desc: 'Structured lessons on password security, phishing, malware, and safe browsing practices, tailored for beginners to advanced users.',
               highlight: true
             },
             { 
               icon: Eye, 
-              title: 'Security Monitoring', 
-              desc: 'Continuous 24/7 monitoring of your systems with real-time threat detection and alerts.' 
+              title: 'Threat Simulations', 
+              desc: 'Practice recognizing and responding to real-world cyber threats like phishing and social engineering in a safe environment.' 
             },
             { 
               icon: Database, 
               title: 'Data Protection', 
-              desc: 'Comprehensive data encryption, backup solutions, and secure data storage management.' 
+              desc: 'Learn how to secure personal and organizational data with encryption and best practices.' 
             },
             { 
               icon: Users, 
-              title: 'Access Management', 
-              desc: 'Secure authentication systems and user access control for enhanced security.' 
+              title: 'Progress Tracking', 
+              desc: 'Monitor your learning journey with personalized dashboards and earn certificates for completed modules.' 
             },
             { 
               icon: Zap, 
-              title: 'Incident Response', 
-              desc: 'Rapid response team for security incidents with expert remediation services.' 
+              title: 'Interactive Quizzes', 
+              desc: 'Test your knowledge with engaging quizzes that reinforce learning and provide instant feedback.' 
             },
             { 
               icon: Award, 
-              title: 'Compliance Support', 
-              desc: 'Ensure your business meets industry standards and regulatory compliance requirements.' 
+              title: 'Certification Program', 
+              desc: 'Earn badges and certificates to showcase your cybersecurity skills and knowledge.' 
             }
           ].map((service, i) => (
             <div 
@@ -291,10 +401,12 @@ export default function Home() {
               <p className="text-gray-300 leading-relaxed mb-6">
                 {service.desc}
               </p>
-              <button className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors flex items-center space-x-2">
-                <span>Read More</span>
-                <span>→</span>
-              </button>
+              <Link href="/services">
+                <button className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors flex items-center space-x-2">
+                  <span>Read More</span>
+                  <span>→</span>
+                </button>
+              </Link>
             </div>
           ))}
         </div>
