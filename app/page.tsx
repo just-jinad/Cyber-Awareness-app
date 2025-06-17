@@ -12,7 +12,7 @@ export default function Home() {
       {/* Background Pattern */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Gradient overlays */}
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-slate-900 via-blue-900/20 to-slate-900"></div>
+        {/* <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-slate-900 via-blue-900/20 to-slate-900"></div> */}
         
         {/* Floating dots and lines */}
         <div className="absolute top-32 right-20 w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
