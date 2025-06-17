@@ -34,13 +34,13 @@ export default function Home() {
           {/* Left Content */}
           <div className="space-y-8">
             <div className="space-y-6">
-              <h1 className="text-4xl lg:text-6xl font-bold leading-tight">
+              <h1 className="text-4xl lg:text-6xl font-bold text-white">
                 Empower Your{' '}
                 <span className="text-cyan-400">
                   Cybersecurity Knowledge
                 </span>
               </h1>
-              <p className="text-lg text-gray-300 leading-relaxed max-w-lg">
+              <p className="text-lg text-white leading-relaxed max-w-lg">
                 Learn to protect yourself from cyber threats with our interactive Cybersecurity Awareness Platform. Master safe online practices through engaging modules, real-world simulations, and personalized learning paths.
               </p>
             </div>
@@ -52,7 +52,7 @@ export default function Home() {
                 </button>
               </Link>
               <Link href="/about">
-                <button className="border border-gray-600 hover:border-gray-500 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300 hover:bg-white/5">
+                <button className="border border-gray-600 hover:border-gray-500 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300 hover:bg-white/10">
                   Learn More
                 </button>
               </Link>
@@ -69,14 +69,14 @@ export default function Home() {
               </div>
               
               {/* Password dots below lock */}
-              <div className="mt-8 bg-slate-800/80 backdrop-blur-none rounded-xl p-6 border border-slate-700 min-w-[280px]">
+              <div className="mt-8 bg-slate-800 rounded-xl p-6 border border-slate-600 min-w-[280px]">
                 <div className="flex items-center justify-center space-x-3 mb-4">
                   <Star className="h-5 w-5 text-yellow-400 fill-current" />
                   <Star className="h-5 w-5 text-yellow-400 fill-current" />
                   <Star className="h-5 w-5 text-yellow-400 fill-current" />
                   <Star className="h-5 w-5 text-gray-600" />
                 </div>
-                <div className="text-center text-gray-300 text-sm mb-4">Password Strength</div>
+                <div className="text-center text-gray-200 text-sm mb-4">Password Strength</div>
                 <div className="w-full bg-gray-700 rounded-full h-2">
                   <div className="bg-gradient-to-r from-cyan-400 to-blue-500 h-2 rounded-full w-3/4"></div>
                 </div>
@@ -108,16 +108,16 @@ export default function Home() {
       </div>
 
       {/* Partner Logos Section */}
-      <div className="bg-slate-800/30 backdrop-blur-none border-y border-slate-700/50 py-12">
+      <div className="bg-slate-800 border-y border-slate-600 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
-            <p className="text-gray-400 text-sm">Trusted by Educational Institutions</p>
+            <p className="text-gray-200 text-sm">Trusted by Educational Institutions</p>
           </div>
-          <div className="flex justify-center items-center space-x-16 opacity-60">
-            <div className="text-gray-400 font-bold text-xl">SQI College of ICT</div>
-            <div className="text-gray-400 font-bold text-xl">University of Lagos</div>
-            <div className="text-gray-400 font-bold text-xl">Ogun State Polytechnic</div>
-            <div className="text-gray-400 font-bold text-xl">Nigerian IT Association</div>
+          <div className="flex justify-center items-center space-x-16">
+            <div className="text-gray-200 font-bold text-xl">SQI College of ICT</div>
+            <div className="text-gray-200 font-bold text-xl">University of Lagos</div>
+            <div className="text-gray-200 font-bold text-xl">Ogun State Polytechnic</div>
+            <div className="text-gray-200 font-bold text-xl">Nigerian IT Association</div>
           </div>
         </div>
       </div>
@@ -127,7 +127,7 @@ export default function Home() {
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Left Visual - Dashboard */}
           <div className="relative">
-            <div className="bg-slate-800/50 backdrop-blur-none rounded-2xl p-8 border border-slate-700/50">
+            <div className="bg-slate-800 rounded-2xl p-8 border border-slate-600">
               {/* Header with shield */}
               <div className="flex items-center space-x-4 mb-8">
                 <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center">
@@ -135,25 +135,25 @@ export default function Home() {
                 </div>
                 <div>
                   <div className="text-white font-semibold">Learning Dashboard</div>
-                  <div className="text-gray-400 text-sm">Track your progress</div>
+                  <div className="text-gray-200 text-sm">Track your progress</div>
                 </div>
               </div>
               
               {/* Learning metrics grid */}
               <div className="grid grid-cols-3 gap-4">
-                <div className="bg-slate-900/60 rounded-lg p-4 border border-slate-600/30">
+                <div className="bg-slate-900 rounded-lg p-4 border border-slate-500">
                   <BookOpen className="h-6 w-6 text-cyan-400 mb-2" />
-                  <div className="text-xs text-gray-400">Modules Completed</div>
+                  <div className="text-xs text-gray-200">Modules Completed</div>
                   <div className="text-sm font-semibold text-white">12/15</div>
                 </div>
-                <div className="bg-slate-900/60 rounded-lg p-4 border border-slate-600/30">
+                <div className="bg-slate-900 rounded-lg p-4 border border-slate-500">
                   <Eye className="h-6 w-6 text-blue-400 mb-2" />
-                  <div className="text-xs text-gray-400">Quizzes Taken</div>
+                  <div className="text-xs text-gray-200">Quizzes Taken</div>
                   <div className="text-sm font-semibold text-white">8/10</div>
                 </div>
-                <div className="bg-slate-900/60 rounded-lg p-4 border border-slate-600/30">
+                <div className="bg-slate-900 rounded-lg p-4 border border-slate-500">
                   <Award className="h-6 w-6 text-yellow-400 mb-2" />
-                  <div className="text-xs text-gray-400">Certificates Earned</div>
+                  <div className="text-xs text-gray-200">Certificates Earned</div>
                   <div className="text-sm font-semibold text-white">3</div>
                 </div>
               </div>
@@ -161,14 +161,14 @@ export default function Home() {
               {/* Status indicators */}
               <div className="mt-6 space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-300">Phishing Training</span>
+                  <span className="text-sm text-gray-200">Phishing Training</span>
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                     <span className="text-xs text-green-400">Completed</span>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-300">Malware Awareness</span>
+                  <span className="text-sm text-gray-200">Malware Awareness</span>
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
                     <span className="text-xs text-yellow-400">In Progress</span>
@@ -187,7 +187,7 @@ export default function Home() {
                   Interactive Modules
                 </span>
               </h2>
-              <p className="text-lg text-gray-300 leading-relaxed">
+              <p className="text-lg text-gray-200 leading-relaxed">
                 Our platform offers a unified learning experience with engaging modules, real-world simulations, and progress tracking to help you master cybersecurity skills and stay safe online.
               </p>
             </div>
@@ -203,7 +203,7 @@ export default function Home() {
                   <div className="w-5 h-5 bg-green-400 rounded-full flex items-center justify-center flex-shrink-0">
                     <div className="w-2 h-2 bg-white rounded-full"></div>
                   </div>
-                  <span className="text-gray-300">{feature}</span>
+                  <span className="text-gray-200">{feature}</span>
                 </div>
               ))}
             </div>
@@ -226,7 +226,7 @@ export default function Home() {
               Hands-On Learning
             </span>
           </h2>
-          <p className="text-lg text-gray-300 leading-relaxed max-w-3xl mx-auto">
+          <p className="text-lg text-gray-200 leading-relaxed max-w-3xl mx-auto">
             Our platform uses interactive simulations, gamified quizzes, and real-world scenarios to make learning cybersecurity engaging and effective, helping you recognize and respond to threats like phishing and malware.
           </p>
         </div>
@@ -251,7 +251,7 @@ export default function Home() {
           ].map((feature, i) => (
             <div
               key={i}
-              className="relative bg-slate-800/50 backdrop-blur-none rounded-2xl p-8 border border-slate-700/50 transition-all duration-300 group hover:transform hover:scale-105"
+              className="relative bg-slate-800 rounded-2xl p-8 border border-slate-600 transition-all duration-300 group hover:transform hover:scale-105"
             >
               <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform bg-gradient-to-br from-slate-700 to-slate-600">
                 <feature.icon className="h-8 w-8 text-white" />
@@ -259,7 +259,7 @@ export default function Home() {
               <h3 className="text-xl font-bold mb-4 text-white group-hover:text-cyan-400 transition-colors">
                 {feature.title}
               </h3>
-              <p className="text-gray-300 leading-relaxed mb-6">
+              <p className="text-gray-200 leading-relaxed mb-6">
                 {feature.desc}
               </p>
               <Link href="/features">
@@ -282,7 +282,7 @@ export default function Home() {
               Our Learners
             </span>
           </h2>
-          <p className="text-lg text-gray-300 leading-relaxed max-w-3xl mx-auto">
+          <p className="text-lg text-gray-200 leading-relaxed max-w-3xl mx-auto">
             Hear from students and professionals who have transformed their cybersecurity skills with our platform, empowering them to stay safe in the digital world.
           </p>
         </div>
@@ -307,12 +307,12 @@ export default function Home() {
           ].map((story, i) => (
             <div
               key={i}
-              className="relative bg-slate-800/50 backdrop-blur-none rounded-2xl p-8 border border-slate-700/50 transition-all duration-300 group hover:transform hover:scale-105"
+              className="relative bg-slate-800 rounded-2xl p-8 border border-slate-600 transition-all duration-300 group hover:transform hover:scale-105"
             >
               <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform bg-gradient-to-br from-slate-700 to-slate-600">
                 <story.icon className="h-8 w-8 text-white" />
               </div>
-              <p className="text-gray-300 leading-relaxed mb-6 italic">
+              <p className="text-gray-200 leading-relaxed mb-6 italic">
                 "{story.quote}"
               </p>
               <h3 className="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors">
@@ -373,10 +373,10 @@ export default function Home() {
           ].map((service, i) => (
             <div 
               key={i} 
-              className={`relative bg-slate-800/50 backdrop-blur-none rounded-2xl p-8 border transition-all duration-300 group hover:transform hover:scale-105 ${
+              className={`relative bg-slate-800 rounded-2xl p-8 border transition-all duration-300 group hover:transform hover:scale-105 ${
                 service.highlight 
                   ? 'border-cyan-400/50 bg-gradient-to-br from-cyan-500/10 to-blue-500/10' 
-                  : 'border-slate-700/50 hover:border-cyan-400/30'
+                  : 'border-slate-600 hover:border-cyan-400/30'
               }`}
             >
               {service.highlight && (
@@ -398,7 +398,7 @@ export default function Home() {
               <h3 className="text-xl font-bold mb-4 text-white group-hover:text-cyan-400 transition-colors">
                 {service.title}
               </h3>
-              <p className="text-gray-300 leading-relaxed mb-6">
+              <p className="text-gray-200 leading-relaxed mb-6">
                 {service.desc}
               </p>
               <Link href="/services">
