@@ -3,7 +3,7 @@
 import { useSession, signOut } from 'next-auth/react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Book, Play, List, LogOut, Menu, Home, Bell, Search, User, Settings, BarChart3, Filter, Calendar, Download, MoreHorizontal } from 'lucide-react';
+import { Book, Play, List, LogOut, Menu, Home, Bell, Search, User, Settings, BarChart3, Filter, Calendar, Download, MoreHorizontal, UserPen } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -34,6 +34,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: 'Simulations', path: '/dashboard/simulations', icon: Play },
     { name: 'Quizzes', path: '/dashboard/quizzes', icon: List },
     { name: 'Analytics', path: '/dashboard/analytics', icon: BarChart3 },
+    { name: 'Assign Module', path: '/dashboard/assign', icon: UserPen },
     { name: 'Settings', path: '/dashboard/settings', icon: Settings },
   ];
 
@@ -46,7 +47,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="w-8 h-8 bg-cyan-500 hover:bg-cyan-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">C</span>
             </div>
-            <span className="text-lg font-semibold">Cyberix</span>
+            <span className="text-lg font-semibold">CyberAware</span>
           </div>
         </div>
         

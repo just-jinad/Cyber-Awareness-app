@@ -17,7 +17,7 @@ const Navbar = () => {
           {/* Logo */}
           <div className="flex items-center space-x-2">
             <Shield className="h-8 w-8 text-cyan-400" />
-            <span className="text-white text-xl font-bold">Cyberix</span>
+            <span className="text-white text-xl font-bold">CyberAware</span>
           </div>
           
           {/* Desktop Navigation Links */}
