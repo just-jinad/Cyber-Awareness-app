@@ -11,7 +11,7 @@ export default function About() {
       
       {/* Background Pattern */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-slate-900 via-blue-900/20 to-slate-900"></div>
+        {/* <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-slate-900 via-blue-900/20 to-slate-900"></div> */}
         <div className="absolute top-32 right-20 w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
         <div className="absolute top-64 left-1/4 w-1 h-1 bg-blue-400 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
         <div className="absolute bottom-1/3 right-1/3 w-1 h-1 bg-cyan-300 rounded-full animate-pulse" style={{animationDelay: '2s'}}></div>
@@ -120,7 +120,7 @@ export default function About() {
               key={i}
               className="relative bg-slate-800/50 backdrop-blur-none rounded-2xl p-8 border border-slate-700/50 transition-all duration-300 group hover:transform hover:scale-105"
             >
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform bg-gradient-to-br from-slate-700 to-slate-600">
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform from-slate-700 to-slate-600">
                 <member.icon className="h-8 w-8 text-white" />
               </div>
               <h3 className="text-xl font-bold mb-2 text-white group-hover:text-cyan-400 transition-colors">

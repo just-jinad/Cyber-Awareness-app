@@ -11,7 +11,7 @@ export default function Contact() {
       
       {/* Background Pattern */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-slate-900 via-blue-900/20 to-slate-900"></div>
+        {/* <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-slate-900 via-blue-900/20 to-slate-900"></div> */}
         <div className="absolute top-32 right-20 w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
         <div className="absolute top-64 left-1/4 w-1 h-1 bg-blue-400 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
         <div className="absolute bottom-1/3 right-1/3 w-1 h-1 bg-cyan-300 rounded-full animate-pulse" style={{animationDelay: '2s'}}></div>
@@ -48,7 +48,7 @@ export default function Contact() {
             </p>
             <div className="space-y-6">
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12 from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center">
                   <Mail className="h-6 w-6 text-white" />
                 </div>
                 <div>
@@ -59,7 +59,7 @@ export default function Contact() {
                 </div>
               </div>
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12  from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center">
                   <Phone className="h-6 w-6 text-white" />
                 </div>
                 <div>
@@ -70,7 +70,7 @@ export default function Contact() {
                 </div>
               </div>
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12  from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center">
                   <MapPin className="h-6 w-6 text-white" />
                 </div>
                 <div>
