@@ -23,9 +23,9 @@ const Navbar = () => {
           {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center space-x-8">
             <Link href="/" className="text-gray-300 hover:text-white transition-colors text-sm">Home</Link>
-            <Link href="/modules" className="text-gray-300 hover:text-white transition-colors text-sm">Modules</Link>
-            <Link href="/simulations" className="text-gray-300 hover:text-white transition-colors text-sm">Simulations</Link>
-            <Link href="#" className="text-gray-300 hover:text-white transition-colors text-sm">Quizzes</Link>
+            {/* <Link href="/modules" className="text-gray-300 hover:text-white transition-colors text-sm">Modules</Link> */}
+            {/* <Link href="/simulations" className="text-gray-300 hover:text-white transition-colors text-sm">Simulations</Link> */}
+            <Link href="/public-quizzes" className="text-gray-300 hover:text-white transition-colors text-sm">Free quizzes</Link>
             <Link href="/About" className="text-gray-300 hover:text-white transition-colors text-sm">About</Link>
             <Link href="/Contact" className="text-gray-300 hover:text-white transition-colors text-sm">Contact</Link>
             <Link href="/auth/signin" className="text-gray-300 hover:text-white transition-colors text-sm">Login</Link>
@@ -60,9 +60,9 @@ const Navbar = () => {
       }`}>
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-slate-900/98 backdrop-blur-sm border-t border-slate-800">
           <Link href="/" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">Home</Link>
-          <Link href="/modules" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">Modules</Link>
-          <Link href="/simulations" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">Simulations</Link>
-          <Link href="#" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">Quizzes</Link>
+          {/* <Link href="/modules" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">Modules</Link> */}
+          {/* <Link href="/simulations" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">Simulations</Link> */}
+          <Link href="/public-quizzes" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">Quizzes</Link>
           <Link href="/About" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">About</Link>
           <Link href="/Contact" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">Contact</Link>
           <Link href="/auth/signin" className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1">Login</Link>

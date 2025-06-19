@@ -142,7 +142,7 @@ export default function About() {
           <p className="text-lg text-gray-300 leading-relaxed mb-8 max-w-3xl mx-auto">
             Start your journey to becoming cybersecurity-savvy today. Explore our interactive platform and empower yourself against digital threats.
           </p>
-          <Link href="/start-learning">
+          <Link href="/auth/signup" className='cursor-pointer'>
             <button className="bg-cyan-500 hover:bg-cyan-600 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300">
               Start Learning Now
             </button>
