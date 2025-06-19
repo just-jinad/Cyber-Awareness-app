@@ -46,13 +46,13 @@ export default function Home() {
             </div>
             
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/start-learning">
-                <button className="bg-cyan-500 hover:bg-cyan-600 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300">
+              <Link href="/auth/signup"className='cursor-pointer'>
+                <button className="bg-cyan-500 cursor-pointer hover:bg-cyan-600 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300">
                   Start Learning Now
                 </button>
               </Link>
-              <Link href="/about">
-                <button className="border border-gray-600 hover:border-gray-500 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300 hover:bg-white/10">
+              <Link href="/About" className='cursor-pointer'>
+                <button className="border  border-gray-600 hover:border-gray-500 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300 hover:bg-white/10">
                   Learn More
                 </button>
               </Link>
@@ -208,11 +208,11 @@ export default function Home() {
               ))}
             </div>
             
-            <Link href="/platform">
-              <button className="bg-cyan-500 hover:bg-cyan-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+            {/* <Link href="/platform">
+              <button className="bg-cyan-500 cursor-pointer hover:bg-cyan-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
                 Explore the Platform
               </button>
-            </Link>
+            </Link> */}
           </div>
         </div>
       </div>
