@@ -20,22 +20,37 @@ export default function ModuleDetail() {
   const id = params.id as string;
   const [module, setModule] = useState<Module | null>(null);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    const fetchModule = async () => {
-      const res = await fetch(`/api/modules/${id}`);
-      if (res.ok) {
-        const data = await res.json();
-        setModule(data);
-      } else {
+    if (status !== 'authenticated' || !session?.user?.id) return;
+
+    const fetchModuleAndProgress = async () => {
+      try {
+        const moduleRes = await fetch(`/api/modules/${id}`);
+        if (!moduleRes.ok) throw new Error('Module not found');
+        const moduleData = await moduleRes.json();
+        setModule(moduleData);
+
+        const progressRes = await fetch(`/api/user-progress?userId=${session.user!.id}&moduleId=${id}`);
+        const progressData = await progressRes.json();
+        if (progressRes.ok && progressData.status === 'completed') {
+          setIsCompleted(true);
+        }
+      } catch (error) {
+        console.error('Error fetching module or progress:', error);
         router.push('/user-dashboard/modules');
       }
     };
-    if (status === 'authenticated') fetchModule();
-  }, [id, status, router]);
+    fetchModuleAndProgress();
+  }, [id, status, session?.user?.id, router]);
 
   const handleComplete = async () => {
-    if (!session?.user?.id || !module) return;
+    if (!session?.user?.id || !module || isCompleted) {
+      setErrorMessage(isCompleted ? 'Module already completed' : 'Invalid session or module');
+      return;
+    }
+
     try {
       const res = await fetch('/api/user-progress', {
         method: 'POST',
@@ -45,17 +60,23 @@ export default function ModuleDetail() {
           moduleId: module.id,
           score: 100,
           status: 'completed',
-          timeTaken: 0, // Add time tracking if needed
+          timeTaken: 0,
         }),
       });
-      const data = await res.json();
-      console.log('Progress update response:', data);
       if (res.ok) {
         setIsCompleted(true);
-        setTimeout(() => router.push('/user-dashboard'), 5000); // 5-second delay
+        await fetch('/api/assignments', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: session.user.id, contentId: module.id, contentType: 'module', status: 'done' }),
+        });
+        setTimeout(() => router.push('/user-dashboard'), 5000);
+      } else {
+        throw new Error('Failed to update progress');
       }
     } catch (error) {
       console.error('Error marking module as completed:', error);
+      setErrorMessage('Failed to mark module as completed. Please try again.');
     }
   };
 
@@ -77,12 +98,18 @@ export default function ModuleDetail() {
           <div className="prose dark:prose-invert max-w-none text-base leading-relaxed" style={{ whiteSpace: 'pre-line' }}>
             {module.content}
           </div>
-          {!isCompleted && (
-            <Button onClick={handleComplete} className="mt-4 bg-cyan-600 text-white">
+          {errorMessage && <p className="text-red-600 mt-4">{errorMessage}</p>}
+          {isCompleted ? (
+            <p className="text-green-600 mt-4">Completed! (Redirecting in 5 seconds...)</p>
+          ) : (
+            <Button
+              onClick={handleComplete}
+              className="mt-4 bg-cyan-600 hover:bg-cyan-700 text-white"
+              disabled={isCompleted}
+            >
               Mark as Completed
             </Button>
           )}
-          {isCompleted && <p className="text-green-600 mt-4">Completed! (Redirecting in 5 seconds...)</p>}
         </CardContent>
       </Card>
     </div>

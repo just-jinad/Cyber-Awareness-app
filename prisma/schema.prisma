@@ -119,6 +119,7 @@ model Assignment {
 
   @@index([userId])
   @@index([contentId])
+  @@unique([userId, contentId, contentType])
 }
 
 enum UserRole {
