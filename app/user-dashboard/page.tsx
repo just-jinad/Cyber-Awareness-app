@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 
@@ -22,10 +23,9 @@ interface UserProgress {
   modules: ProgressItem[];
   quizzes: ProgressItem[];
   simulations: ProgressItem[];
-  assignments: { contentId: number; contentType: string; status: string; user: { username: string }; admin: { username: string } }[];
+  assignments: { contentId: number; contentType: ContentType; status: string; user: { username: string }; admin: { username: string } }[];
 }
 
-// Type-safe function to access progress items
 const getProgressItems = (progress: UserProgress, contentType: ContentType): ProgressItem[] => {
   switch (contentType) {
     case 'module':
@@ -42,6 +42,7 @@ export default function UserDashboard() {
   const [progress, setProgress] = useState<UserProgress | null>(null);
   const [progressPercentage, setProgressPercentage] = useState<number>(0);
   const [completionMessage, setCompletionMessage] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   useEffect(() => {
     if (status === 'loading' || !session?.user?.id) return;
@@ -49,16 +50,20 @@ export default function UserDashboard() {
     const fetchProgress = async () => {
       try {
         const res = await fetch(`/api/user-progress?userId=${session.user!.id}`);
+        if (!res.ok) throw new Error(`Failed to fetch progress: ${res.statusText}`);
         const data = await res.json();
-        if (res.ok && data) {
-          const assignmentsRes = await fetch(`/api/assignments?userId=${session.user!.id}`);
-          const assignments = await assignmentsRes.json();
-          setProgress({ ...data, assignments: assignments || [] });
-        } else {
-          setProgress({ level: 'beginner', modules: [], quizzes: [], simulations: [], assignments: [] });
-        }
+        if (!data) throw new Error('No progress data returned');
+
+        const assignmentsRes = await fetch(`/api/assignments?userId=${session.user!.id}`);
+        if (!assignmentsRes.ok) throw new Error(`Failed to fetch assignments: ${assignmentsRes.statusText}`);
+        const assignments = await assignmentsRes.json();
+        console.log('Fetched assignments:', assignments); // Debug log
+        if (!Array.isArray(assignments)) throw new Error('Assignments is not an array');
+
+        setProgress({ ...data, assignments });
       } catch (error) {
-        console.error('Error fetching progress:', error);
+        console.error('Error fetching progress or assignments:', error);
+        setErrorMessage('Failed to load progress or assignments. Please try again.');
         setProgress({ level: 'beginner', modules: [], quizzes: [], simulations: [], assignments: [] });
       }
     };
@@ -109,46 +114,50 @@ export default function UserDashboard() {
           timeTaken: 0,
         }),
       });
-      if (res.ok) {
-        setProgress(prev => {
-          if (!prev) return prev;
-          const updatedItems = getProgressItems(prev, contentType).map(item =>
-            item.id === contentId ? { ...item, status: 'completed' } : item
-          );
-          const updatedAssignments = prev.assignments.map(a =>
-            a.contentId === contentId && a.contentType === contentType ? { ...a, status: 'done' } : a
-          );
-          return { ...prev, [contentType + 's']: updatedItems, assignments: updatedAssignments };
-        });
+      if (!res.ok) throw new Error(`Failed to update progress: ${res.statusText}`);
+      setProgress(prev => {
+        if (!prev) return prev;
+        const updatedItems = getProgressItems(prev, contentType).map(item =>
+          item.id === contentId ? { ...item, status: 'completed' } : item
+        );
+        const updatedAssignments = prev.assignments.map(a =>
+          a.contentId === contentId && a.contentType === contentType ? { ...a, status: 'done' } : a
+        );
+        return { ...prev, [contentType + 's']: updatedItems, assignments: updatedAssignments };
+      });
 
-        await fetch('/api/assignments', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: session.user.id, contentId, contentType, status: 'done' }),
-        });
-      }
+      await fetch('/api/assignments', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: session.user.id, contentId, contentType, status: 'done' }),
+      });
     } catch (error) {
       console.error(`Error marking ${contentType} as completed:`, error);
+      setErrorMessage(`Failed to mark ${contentType} as completed. Please try again.`);
+      setTimeout(() => setErrorMessage(''), 5000);
     }
   };
 
   if (status === 'loading' || !progress) {
-    return <div className="container mx-auto p-6">Loading...</div>;
+    return <div className="container mx-auto p-6 text-white">Loading...</div>;
   }
 
   if (!session?.user) {
-    return <div className="container mx-auto p-6">Please log in to view your dashboard.</div>;
+    return <div className="container mx-auto p-6 text-white">Please log in to view your dashboard.</div>;
   }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <h1 className="text-3xl font-bold">My Dashboard</h1>
+      <h1 className="text-3xl font-bold text-white">Welcome, {session.user?.name || 'User'}!</h1>
+      {errorMessage && (
+        <Alert className="bg-red-800 border-red-700">
+          <AlertDescription className="text-white">{errorMessage}</AlertDescription>
+        </Alert>
+      )}
       {completionMessage && (
-        <Card className="bg-green-800 border-green-700">
-          <CardContent className="p-4">
-            <p className="text-lg text-white">{completionMessage}</p>
-          </CardContent>
-        </Card>
+        <Alert className="bg-green-800 border-green-700">
+          <AlertDescription className="text-white">{completionMessage}</AlertDescription>
+        </Alert>
       )}
       <Card className="bg-gray-800 border-gray-700">
         <CardHeader>
@@ -162,7 +171,7 @@ export default function UserDashboard() {
               style={{ width: `${Math.min(100, progressPercentage)}%` }}
             />
           </div>
-          <p className="text-sm text-gray-400 mt-2">Progress: {Math.round(progressPercentage)}%</p>
+          <p className="text-md text-gray-400 mt-2">Progress: {Math.round(progressPercentage)}%</p>
           <div className="mt-4 space-y-2 text-sm text-gray-300">
             <p>Simulations: {progress.simulations.filter(s => s.status === 'completed').length}/1</p>
             <p>Quizzes: {progress.quizzes.filter(q => q.status === 'completed').length}/2</p>
@@ -171,7 +180,7 @@ export default function UserDashboard() {
         </CardContent>
       </Card>
 
-      <Card className="bg-gray-800 border-gray-700">
+     <Card className="bg-gray-800 border-gray-600">
         <CardHeader>
           <CardTitle className="text-white">My Assigned Content</CardTitle>
         </CardHeader>
@@ -182,30 +191,29 @@ export default function UserDashboard() {
             <ul className="space-y-2">
               {progress.assignments.map((assignment, index) => {
                 const contentType = assignment.contentType as ContentType;
-                const item = getProgressItems(progress, contentType).find(i => i.id === assignment.contentId);
-                if (!item) return null;
+                const progressItem = getProgressItems(progress, contentType).find(i => i.id === assignment.contentId);
                 return (
                   <li key={index} className="text-lg text-gray-300 flex items-center space-x-2">
                     <Link
                       href={`/user-dashboard/${assignment.contentType}s/${assignment.contentId}`}
-                      className="text-cyan-400 hover:text-cyan-300"
+                      className="text-cyan-400 hover:text-cyan-200"
                     >
-                      {item.title}
+                      {progressItem?.title || `Content ID: ${assignment.contentId}`}
                     </Link>
                     <span>- Status: {assignment.status}</span>
                     <TooltipProvider>
                       <Tooltip>
-                        <TooltipTrigger>
+                        <TooltipTrigger asChild>
                           <Button
                             onClick={() => handleComplete(assignment.contentId, contentType)}
-                            disabled={item.status === 'completed'}
-                            className={`px-2 py-1 text-sm ${item.status === 'completed' ? 'bg-gray-500 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'}`}
+                            disabled={progressItem?.status === 'completed'}
+                            className={`px-2 text-sm ${progressItem?.status === 'completed' ? 'bg-gray-500 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'}`}
                           >
-                            {item.status === 'completed' ? 'Completed' : 'Mark Completed'}
+                            {progressItem?.status === 'completed' ? 'Completed' : 'Mark Completed'}
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>
-                          {item.status === 'completed' ? 'Already completed' : 'Mark as completed'}
+                          {progressItem?.status === 'completed' ? 'Already completed' : 'Mark as completed'}
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
