@@ -35,38 +35,30 @@ export default function QuizPage() {
   useEffect(() => {
     const fetchQuizAndVerifyPin = async () => {
       try {
-        // Fetch quiz data
         const res = await fetch(`/api/quizzes/${id}`);
-        if (res.ok) {
-          const data = await res.json();
-          setQuiz(data);
+        if (!res.ok) throw new Error('Quiz not found');
+        const data = await res.json();
+        setQuiz(data);
 
-          // Check if PIN is pre-verified via query parameter
-          if (data.type === 'pin-protected' && searchParams.get('pinVerified') === 'true') {
-            const storedPin = sessionStorage.getItem('quizPin');
-            if (storedPin) {
-              // Re-validate PIN server-side
-              const verifyResponse = await fetch('/api/quizzes/pin/validate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ pin: storedPin, quizId: id }),
-              });
-
-              if (verifyResponse.ok) {
-                setIsPinVerified(true);
-                sessionStorage.removeItem('quizPin'); // Clean up
-              } else {
-                setPinError('PIN validation failed. Please re-enter PIN.');
-                sessionStorage.removeItem('quizPin');
-              }
+        if (data.type === 'pin-protected' && searchParams.get('pinVerified') === 'true') {
+          const storedPin = sessionStorage.getItem('quizPin');
+          if (storedPin) {
+            const verifyResponse = await fetch('/api/quizzes/pin/validate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ pin: storedPin, quizId: id }),
+            });
+            if (verifyResponse.ok) {
+              setIsPinVerified(true);
+              sessionStorage.removeItem('quizPin');
             } else {
-              setPinError('No PIN found. Please re-enter PIN.');
+              setPinError('Invalid PIN. Please re-enter PIN.');
             }
-          } else if (data.type !== 'pin-protected') {
-            setIsPinVerified(true); // Auto-verify non-pin quizzes
+          } else {
+            setPinError('No PIN found. Please re-enter PIN.');
           }
-        } else {
-          router.push('/user-dashboard/quizzes');
+        } else if (data.type !== 'pin-protected') {
+          setIsPinVerified(true);
         }
       } catch (error) {
         console.error('Error fetching quiz:', error);
@@ -95,7 +87,7 @@ export default function QuizPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Invalid PIN. Please try again.');
+        throw new Error(errorData.error || 'Invalid PIN.');
       }
 
       setIsPinVerified(true);
@@ -125,40 +117,35 @@ export default function QuizPage() {
     setFeedback(feedbackMessages);
 
     try {
-      const res = await fetch('/api/quiz-results', {
+      const resultRes = await fetch('/api/quiz-results', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ quizId: quiz.id, score: totalScore, answers, userId: session?.user?.id }),
       });
-      const data = await res.json();
-      console.log('Quiz result response:', data);
+      if (!resultRes.ok) throw new Error('Failed to save quiz results');
+      const resultData = await resultRes.json();
+      console.log('Quiz result response:', resultData);
 
-      // Only update progress for module-linked quizzes
-      if (quiz.type === 'module-linked' && quiz.moduleId) {
-        const progressRes = await fetch('/api/user-progress', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userId: session.user!.id,
-            moduleId: quiz.moduleId,
-            score: totalScore,
-            status: totalScore > 0 ? 'completed' : 'failed',
-            timeTaken: 0,
-          }),
-        });
-        const progressData = await progressRes.json();
-        console.log('Progress update response:', progressData);
+      const progressRes = await fetch('/api/user-progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: session.user?.id,
+          quizId: quiz.id,
+          score: totalScore,
+          status: totalScore > 0 ? 'completed' : 'failed',
+          timeTaken: 0,
+        }),
+      });
+      if (!progressRes.ok) throw new Error('Failed to update progress');
+      const progressData = await progressRes.json();
+      console.log('Progress update response:', progressData);
 
-        if (progressRes.ok) {
-          setFeedback([...feedbackMessages, 'Redirecting in 5 seconds...']);
-          setTimeout(() => router.push('/user-dashboard'), 5000);
-        }
-      } else {
-        setFeedback([...feedbackMessages, 'Quiz completed! Returning to dashboard...']);
-        setTimeout(() => router.push('/user-dashboard/quizzes'), 5000);
-      }
+      setFeedback([...feedbackMessages, 'Quiz completed! Redirecting to dashboard in 5 seconds...']);
+      setTimeout(() => router.push('/user-dashboard'), 5000);
     } catch (error) {
       console.error('Error submitting quiz:', error);
+      setFeedback([...feedbackMessages, 'Error submitting quiz. Please try again.']);
     }
   };
 
