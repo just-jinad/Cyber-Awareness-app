@@ -4,12 +4,18 @@ import { notFound } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
+// Define props type for Next.js App Router
+interface FreeModulePageProps {
+  params: Promise<{ id: string }>; // params is a Promise
+}
+
 export async function generateStaticParams() {
   return freeModules.map(module => ({ id: module.id }));
 }
 
-export default function FreeModulePage({ params }: { params: { id: string } }) {
-  const module = freeModules.find(m => m.id === params.id);
+export default async function FreeModulePage({ params }: FreeModulePageProps) {
+  const { id } = await params; // Await params to get id
+  const module = freeModules.find(m => m.id === id);
   if (!module) notFound();
 
   return (
