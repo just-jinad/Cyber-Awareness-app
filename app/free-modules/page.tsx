@@ -1,7 +1,7 @@
-import Link from 'next/link';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import { freeModules } from '@/lib/free-modules';
+import Link from "next/link";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { freeModules } from "@/lib/free-modules";
 
 export default function FreeModules() {
   return (
@@ -10,11 +10,12 @@ export default function FreeModules() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center mb-16">
           <h1 className="text-4xl lg:text-5xl font-bold mb-4">
-            Free Cybersecurity{' '}
-            <span className="text-cyan-400">Modules</span>
+            Free Cybersecurity <span className="text-cyan-400">Modules</span>
           </h1>
           <p className="text-lg text-gray-200 leading-relaxed max-w-3xl mx-auto">
-            Explore our free modules to build your cybersecurity knowledge. Learn essential skills to stay safe online, and sign up for access to more advanced content.
+            Explore our free modules to build your cybersecurity knowledge.
+            Learn essential skills to stay safe online, and sign up for access
+            to more advanced content.
           </p>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">

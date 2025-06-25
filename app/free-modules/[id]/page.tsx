@@ -1,8 +1,8 @@
-import Link from 'next/link';
-import { freeModules } from '@/lib/free-modules';
-import { notFound } from 'next/navigation';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import Link from "next/link";
+import { freeModules } from "@/lib/free-modules";
+import { notFound } from "next/navigation";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 // Define props type for Next.js App Router
 interface FreeModulePageProps {
@@ -10,12 +10,12 @@ interface FreeModulePageProps {
 }
 
 export async function generateStaticParams() {
-  return freeModules.map(module => ({ id: module.id }));
+  return freeModules.map((module) => ({ id: module.id }));
 }
 
 export default async function FreeModulePage({ params }: FreeModulePageProps) {
   const { id } = await params; // Await params to get id
-  const module = freeModules.find(m => m.id === id);
+  const module = freeModules.find((m) => m.id === id);
   if (!module) notFound();
 
   return (
