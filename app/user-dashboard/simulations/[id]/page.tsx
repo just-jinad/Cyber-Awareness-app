@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { Loader2 } from 'lucide-react';
 
 interface Simulation {
   id: number;
@@ -29,12 +30,15 @@ export default function SimulationPage() {
   const [feedback, setFeedback] = useState<string>('');
   const [fakeCredentials, setFakeCredentials] = useState({ username: '', password: '' });
   const [isCompleted, setIsCompleted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string>('');
 
   useEffect(() => {
     if (status !== 'authenticated' || !session?.user?.id) return;
 
     const fetchSimulationAndProgress = async () => {
       try {
+        setIsLoading(true);
         const simRes = await fetch(`/api/simulations/${id}`);
         if (!simRes.ok) throw new Error('Simulation not found');
         const simData = await simRes.json();
@@ -42,13 +46,16 @@ export default function SimulationPage() {
         setStepState({ currentStep: 0, choices: new Array(simData.steps.length).fill(null), timeTaken: 0 });
 
         const progressRes = await fetch(`/api/user-progress?userId=${session.user!.id}&simulationId=${id}`);
+        if (!progressRes.ok) throw new Error('Failed to fetch progress');
         const progressData = await progressRes.json();
-        if (progressRes.ok && progressData.status === 'completed') {
+        if (progressData.status === 'completed') {
           setIsCompleted(true);
         }
       } catch (error) {
         console.error('Error fetching simulation or progress:', error);
-        router.push('/user-dashboard/simulations');
+        setError('Simulation not found.');
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchSimulationAndProgress();
@@ -115,34 +122,45 @@ export default function SimulationPage() {
           timeTaken: stepState.timeTaken,
         }),
       });
-      if (res.ok) {
-        setIsCompleted(true);
-        await fetch('/api/assignments', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: session.user.id, contentId: simulation.id, contentType: 'simulation', status: 'done' }),
-        });
-        setFeedback(feedback + ' (Redirecting in 5 seconds...)');
-        setTimeout(() => router.push('/user-dashboard'), 5000);
-      }
+      if (!res.ok) throw new Error('Failed to save progress');
+      setIsCompleted(true);
+      await fetch('/api/assignments', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: session.user.id, contentId: simulation.id, contentType: 'simulation', status: 'done' }),
+      });
+      setFeedback(feedback + ' Redirecting in 5 seconds...');
+      setTimeout(() => router.push('/dashboard/user'), 5000);
     } catch (error) {
       console.error('Error marking simulation as completed:', error);
       setFeedback('Error saving progress. Please try again.');
     }
   };
 
-  if (status === 'loading') return <div className="container mx-auto p-6">Loading...</div>;
-  if (!session) return <div className="container mx-auto p-6">Please sign in to access this simulation.</div>;
-  if (!simulation) return <div className="container mx-auto p-6">Simulation not found.</div>;
+  if (status === 'loading') return (
+    <div className="container mx-auto p-6 flex items-center justify-center">
+      <Loader2 className="h-8 w-8 animate-spin text-cyan-600" />
+      <span className="ml-2 text-white">Loading...</span>
+    </div>
+  );
+  if (!session) return <div className="container mx-auto p-6 text-white">Please sign in to access this simulation.</div>;
+  if (isLoading) return (
+    <div className="container mx-auto p-6 flex items-center justify-center">
+      <Loader2 className="h-8 w-8 animate-spin text-cyan-600" />
+      <span className="ml-2 text-white">Loading...</span>
+    </div>
+  );
+  if (error) return <div className="container mx-auto p-6 text-white">{error}</div>;
 
+  if (!simulation) return null;
   const currentStepData = simulation.steps[stepState.currentStep];
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">{simulation.title}</h1>
+      <h1 className="text-3xl font-bold mb-6 text-white">{simulation.title}</h1>
       <Card className="bg-gray-800 border-gray-700">
         <CardHeader>
-          <CardTitle>Step {stepState.currentStep + 1}</CardTitle>
+          <CardTitle className="text-white">Step {stepState.currentStep + 1}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {isCompleted ? (
@@ -220,7 +238,7 @@ export default function SimulationPage() {
                   )}
                 </div>
               )}
-              <p className="text-lg">Time Elapsed: {stepState.timeTaken} seconds</p>
+              <p className="text-lg text-white">Time Elapsed: {stepState.timeTaken} seconds</p>
               {feedback && (
                 <div className="mt-4">
                   <p className={`text-lg ${feedback.includes('breach') ? 'text-red-600' : feedback.includes('success') ? 'text-green-600' : 'text-gray-600'}`}>
