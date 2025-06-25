@@ -114,7 +114,7 @@ const Navbar = () => {
           </Link>
           <Link
             href="/public-quizzes"
-            className="text-gray-300 hover:text-white transition-colors text-sm"
+             className="text-gray-300 hover:text-white block px-3 py-2 text-base transition-all duration-200 transform hover:translate-x-1"
           >
             Free quizzes
           </Link>
