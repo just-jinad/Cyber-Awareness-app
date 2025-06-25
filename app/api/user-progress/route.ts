@@ -1,27 +1,47 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/authOptions';
 
 const prisma = new PrismaClient();
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  const { searchParams } = new URL(req.url);
+  const userId = searchParams.get('userId');
+
+  // Validate userId
+  if (!userId) {
+    return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
+  }
+  const userIdNum = Number(userId);
+  if (isNaN(userIdNum)) {
+    return NextResponse.json({ error: 'Invalid userId' }, { status: 400 });
+  }
+
+  // Restrict access: Admins can fetch any user, users can only fetch their own
+  if (session.user.role !== 'ADMIN' && userIdNum !== session.user.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
-    const userId = session.user.id;
     const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { level: true },
+      where: { id: userIdNum },
+      select: { username: true, level: true },
     });
 
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
     const userProgress = await prisma.userProgress.findMany({
-      where: { userId },
+      where: { userId: userIdNum },
       select: {
-        id: true, // Include ID for each progress entry
+        id: true,
         module: { select: { title: true } },
         simulation: { select: { title: true } },
         quiz: { select: { title: true } },
@@ -31,42 +51,28 @@ export async function GET() {
       },
     });
 
-    const completedCount = userProgress.filter(up => up.status === 'completed').length;
-    const averageScore = userProgress.length > 0
-      ? userProgress.reduce((sum: number, up: { score?: number }) => sum + (up.score || 0), 0) / userProgress.length
-      : 0;
+    // Calculate total activities for progress percentage
+    const totalActivities = await prisma.$transaction([
+      prisma.quiz.count(),
+      prisma.simulation.count(),
+      prisma.module.count(),
+    ]);
+    const total = totalActivities.reduce((sum, count) => sum + count, 0);
+
+    const activities = userProgress.map(up => ({
+      title: up.module?.title || up.simulation?.title || up.quiz?.title || 'Unknown',
+      type: up.module ? 'Module' : up.simulation ? 'Simulation' : 'Quiz',
+      level: up.level || 'unknown',
+      status: up.status || 'not started',
+      score: up.score || 0,
+    }));
 
     const progressData = {
-      level: user?.level || 'beginner',
-      progress: averageScore,
-      completedCount,
-      modules: userProgress
-        .filter(up => up.module)
-        .map(up => ({
-          id: up.id,
-          title: up.module!.title,
-          level: up.level,
-          status: up.status || 'not started',
-          score: up.score || 0,
-        })),
-      simulations: userProgress
-        .filter(up => up.simulation)
-        .map(up => ({
-          id: up.id,
-          title: up.simulation!.title,
-          level: up.level,
-          status: up.status || 'not started',
-          score: up.score || 0,
-        })),
-      quizzes: userProgress
-        .filter(up => up.quiz)
-        .map(up => ({
-          id: up.id,
-          title: up.quiz!.title,
-          level: up.level,
-          status: up.status || 'not started',
-          score: up.score || 0,
-        })),
+      userId: userId, // Keep as string for consistency with dashboard
+      username: user.username || 'Unknown User',
+      level: user.level || 'beginner',
+      progress: total > 0 ? (userProgress.filter(up => up.status === 'completed').length / total) * 100 : 0,
+      activities,
     };
 
     return NextResponse.json(progressData, { status: 200 });
@@ -86,14 +92,15 @@ export async function POST(request: Request) {
 
   try {
     const { userId, moduleId, simulationId, quizId, score, status, timeTaken } = await request.json();
-    if (userId !== session.user.id) {
+    const userIdNum = Number(userId);
+    if (isNaN(userIdNum) || userIdNum !== session.user.id) {
       return NextResponse.json({ error: 'Unauthorized to update progress for another user' }, { status: 403 });
     }
 
     // Check if progress already exists for this content
     const existingProgress = await prisma.userProgress.findFirst({
       where: {
-        userId: Number(userId),
+        userId: userIdNum,
         OR: [
           { moduleId: moduleId ? Number(moduleId) : undefined },
           { simulationId: simulationId ? Number(simulationId) : undefined },
@@ -108,7 +115,7 @@ export async function POST(request: Request) {
 
     const progress = await prisma.userProgress.create({
       data: {
-        userId: Number(userId),
+        userId: userIdNum,
         moduleId: moduleId ? Number(moduleId) : undefined,
         simulationId: simulationId ? Number(simulationId) : undefined,
         quizId: quizId ? Number(quizId) : undefined,

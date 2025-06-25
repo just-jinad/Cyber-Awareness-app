@@ -2,7 +2,10 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Menu, Home, Book, Play, List, User } from 'lucide-react';
+import { Menu, Home, Book, Play, List, User, LogOut } from 'lucide-react';
+import { signOut } from 'next-auth/react';
+import { toast, Toaster } from 'react-hot-toast';
+import { Button } from '@/components/ui/button';
 
 export default function UserDashboardLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -14,8 +17,43 @@ export default function UserDashboardLayout({ children }: { children: React.Reac
     { name: 'Modules', path: '/user-dashboard/modules', icon: Book },
   ];
 
+  const handleLogout = () => {
+    toast.custom((t) => (
+      <div
+        className={`${
+          t.visible ? 'animate-enter' : 'animate-leave'
+        } max-w-md w-full bg-gray-800 border border-gray-700 rounded-lg shadow-lg p-4 text-white`}
+      >
+        <div className="flex flex-col space-y-4">
+          <p className="text-sm font-medium">Are you sure you want to log out?</p>
+          <div className="flex space-x-2">
+            <Button
+              onClick={() => {
+                toast.dismiss(t.id);
+                signOut({ callbackUrl: '/auth/signin' });
+              }}
+              className="bg-cyan-600 hover:bg-cyan-700 text-white flex-1"
+            >
+              Confirm
+            </Button>
+            <Button
+              onClick={() => toast.dismiss(t.id)}
+              className="bg-gray-600 hover:bg-gray-500 text-white flex-1"
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      </div>
+    ), {
+      duration: Infinity,
+      position: 'top-center',
+    });
+  };
+
   return (
     <div className="flex h-screen bg-[#111d3c] text-white overflow-hidden">
+      <Toaster />
       {/* Sidebar */}
       <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-800 border-r border-gray-700 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:inset-0`}>
         <div className="flex items-center justify-between p-4 border-b border-gray-700">
@@ -40,6 +78,16 @@ export default function UserDashboardLayout({ children }: { children: React.Reac
             </Link>
           ))}
         </nav>
+
+        <div className="p-3 border-t border-gray-700">
+          <button
+            onClick={handleLogout}
+            className="flex items-center w-full px-3 py-2 text-sm font-medium text-gray-300 rounded-lg hover:bg-gray-700 hover:text-white transition-colors"
+          >
+            <LogOut className="mr-3 h-5 w-5" />
+            Logout
+          </button>
+        </div>
       </aside>
 
       {/* Main Content */}

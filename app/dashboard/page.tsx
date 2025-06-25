@@ -20,10 +20,11 @@ interface User {
 }
 
 interface UserProgress {
-  userId: number; // Ensure this is included in the API response
+  userId: string;
+  username: string;
   level: string;
   progress: number;
-  modules: { title: string; level: string; status: string; score: number }[];
+  activities: { title: string; type: string; level: string; status: string; score: number }[];
 }
 
 const analyticsData = [
@@ -156,9 +157,7 @@ export default function DashboardHome() {
       const res = await fetch(`/api/user-progress?userId=${userId}`);
       const data = await res.json();
       if (res.ok && data) {
-        // Ensure userId is included in the response
-        const progressWithUserId: UserProgress = { ...data, userId };
-        setSelectedUserProgress(progressWithUserId);
+        setSelectedUserProgress(data);
       } else {
         setSelectedUserProgress(null);
         console.warn('No progress data or invalid response:', data);
@@ -284,7 +283,6 @@ export default function DashboardHome() {
 
       {/* Analytics and Sessions */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Analytics Chart */}
         <Card className="lg:col-span-2 bg-gray-800 border-gray-700">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
@@ -334,7 +332,6 @@ export default function DashboardHome() {
           </CardContent>
         </Card>
 
-        {/* Sessions by Country */}
         <Card className="bg-gray-800 border-gray-700">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-white">Sessions by Country</CardTitle>
@@ -370,7 +367,7 @@ export default function DashboardHome() {
       {selectedUserProgress && (
         <Card className="bg-gray-800 border-gray-700">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-white">Progress for {users.find(u => u.id === selectedUserProgress.userId)?.username || 'Unknown User'}</CardTitle>
+            <CardTitle className="text-white">Progress for {selectedUserProgress.username}</CardTitle>
             <button
               onClick={() => setSelectedUserProgress(null)}
               className="p-2 hover:bg-gray-700 rounded-lg"
@@ -381,11 +378,11 @@ export default function DashboardHome() {
           <CardContent>
             <p className="text-lg text-gray-300">Level: {selectedUserProgress.level}</p>
             <p className="text-lg text-gray-300">Progress: {selectedUserProgress.progress.toFixed(2)}%</p>
-            <h3 className="text-lg font-semibold mt-4">Completed Modules:</h3>
+            <h3 className="text-lg font-semibold mt-4 text-white">Activities:</h3>
             <ul className="space-y-2">
-              {selectedUserProgress.modules.map((module, index) => (
+              {selectedUserProgress.activities.map((activity, index) => (
                 <li key={index} className="text-lg text-gray-300">
-                  {module.title} - Status: {module.status}, Score: {module.score}
+                  {activity.type}: {activity.title} - Level: {activity.level}, Status: {activity.status}, Score: {activity.score}
                 </li>
               ))}
             </ul>

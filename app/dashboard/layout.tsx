@@ -3,14 +3,49 @@
 import { useSession, signOut } from 'next-auth/react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Book, Play, List, LogOut, Menu, Home, Bell, Search, User, Settings, BarChart3, Filter, Calendar, Download, MoreHorizontal, UserPen } from 'lucide-react';
+import { Book, Play, List, LogOut, Menu, Home, Bell, Search, User, Settings, BarChart3, Filter, Calendar, UserPen } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { toast, Toaster } from 'react-hot-toast';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const pathname = usePathname();
+
+  const handleLogout = () => {
+    toast.custom((t) => (
+      <div
+        className={`${
+          t.visible ? 'animate-enter' : 'animate-leave'
+        } max-w-md w-full bg-gray-800 border border-gray-700 rounded-lg shadow-lg p-4 text-white`}
+      >
+        <div className="flex flex-col space-y-4">
+          <p className="text-sm font-medium">Are you sure you want to log out?</p>
+          <div className="flex space-x-2">
+            <Button
+              onClick={() => {
+                toast.dismiss(t.id);
+                signOut({ callbackUrl: '/auth/signin' });
+              }}
+              className="bg-cyan-600 hover:bg-cyan-700 text-white flex-1"
+            >
+              Confirm
+            </Button>
+            <Button
+              onClick={() => toast.dismiss(t.id)}
+              className="bg-gray-600 hover:bg-gray-500 text-white flex-1"
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      </div>
+    ), {
+      duration: Infinity,
+      position: 'top-center',
+    });
+  };
 
   if (status === 'loading') {
     return (
@@ -40,6 +75,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex h-screen bg-[#111d3c] text-white overflow-hidden">
+      <Toaster />
       {/* Sidebar */}
       <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-800 border-r border-gray-700 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:inset-0`}>
         <div className="flex items-center justify-between p-4 border-b border-gray-700">
@@ -71,7 +107,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         <div className="p-3 border-t border-gray-700">
           <button
-            onClick={() => signOut({ callbackUrl: '/auth/signin' })}
+            onClick={handleLogout}
             className="flex items-center w-full px-3 py-2 text-sm font-medium text-gray-300 rounded-lg hover:bg-gray-700 hover:text-white transition-colors"
           >
             <LogOut className="mr-3 h-5 w-5" />
@@ -138,16 +174,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </header>
 
-        {/* Main Content Area */}
         <main className="flex-1 overflow-y-auto bg-gray-900 p-6">
           {children}
         </main>
       </div>
 
-      {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z quedar-t border-gray-400"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
