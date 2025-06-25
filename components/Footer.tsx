@@ -44,7 +44,6 @@ const Footer = () => {
                 'Safe Browsing',
                 'Data Protection',
                 'Social Engineering',
-                'Interactive Simulations',
                 'Certification Program'
               ].map((resource, i) => (
                 <li key={i}>

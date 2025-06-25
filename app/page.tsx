@@ -262,12 +262,12 @@ export default function Home() {
               <p className="text-gray-200 leading-relaxed mb-6">
                 {feature.desc}
               </p>
-              <Link href="/features">
+              {/* <Link href="/features">
                 <button className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors flex items-center space-x-2">
                   <span>Learn More</span>
                   <span>→</span>
                 </button>
-              </Link>
+              </Link> */}
             </div>
           ))}
         </div>
@@ -401,12 +401,12 @@ export default function Home() {
               <p className="text-gray-200 leading-relaxed mb-6">
                 {service.desc}
               </p>
-              <Link href="/services">
+              {/* <Link href="/services">
                 <button className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors flex items-center space-x-2">
                   <span>Read More</span>
                   <span>→</span>
                 </button>
-              </Link>
+              </Link> */}
             </div>
           ))}
         </div>
