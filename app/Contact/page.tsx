@@ -123,7 +123,7 @@ export default function Contact() {
                   className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-colors"
                 ></textarea>
               </div>
-              <button className="w-full bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center space-x-2">
+              <button className="w-full bg-cyan-500 cursor-pointer hover:bg-cyan-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center space-x-2">
                 <span>Send Message</span>
                 <Send className="h-5 w-5" />
               </button>
@@ -142,7 +142,7 @@ export default function Contact() {
             Explore our platform’s interactive modules and simulations to enhance your cybersecurity skills today.
           </p>
           <Link href="/auth/signup" className='cursor-pointer'>
-            <button className="bg-cyan-500 hover:bg-cyan-600 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300">
+            <button className="bg-cyan-500 hover:bg-cyan-600 cursor-pointer text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300">
               Start Learning Now
             </button>
           </Link>

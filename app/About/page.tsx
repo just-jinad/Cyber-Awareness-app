@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Shield, Users, BookOpen, Zap, Award } from 'lucide-react';
+import { Shield, Users, BookOpen, Zap, Award, Computer, ComputerIcon } from 'lucide-react';
 
 export default function About() {
   return (
@@ -110,10 +110,10 @@ export default function About() {
               icon: BookOpen
             },
             {
-              name: 'SQI ICT Faculty',
-              role: 'Academic Support',
-              desc: 'The faculty at SQI College of ICT, providing expertise and resources for the platform.',
-              icon: Award
+              name: 'Tope Jinad',
+              role: 'Full-stack Developer',
+              desc: 'Providing expertise and technical support for the platform.',
+              icon: Computer
             }
           ].map((member, i) => (
             <div
@@ -143,7 +143,7 @@ export default function About() {
             Start your journey to becoming cybersecurity-savvy today. Explore our interactive platform and empower yourself against digital threats.
           </p>
           <Link href="/auth/signup" className='cursor-pointer'>
-            <button className="bg-cyan-500 hover:bg-cyan-600 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300">
+            <button className="bg-cyan-500 hover:bg-cyan-600 text-white cursor-pointer px-8 py-4 rounded-lg font-semibold transition-all duration-300">
               Start Learning Now
             </button>
           </Link>
