@@ -7,6 +7,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
+import { Loader2 } from 'lucide-react';
 
 type ContentType = 'module' | 'quiz' | 'simulation';
 
@@ -29,11 +30,13 @@ interface UserProgress {
 const getProgressItems = (progress: UserProgress, contentType: ContentType): ProgressItem[] => {
   switch (contentType) {
     case 'module':
-      return progress.modules;
+      return progress.modules || [];
     case 'quiz':
-      return progress.quizzes;
+      return progress.quizzes || [];
     case 'simulation':
-      return progress.simulations;
+      return progress.simulations || [];
+    default:
+      return [];
   }
 };
 
@@ -54,17 +57,51 @@ export default function UserDashboard() {
         const data = await res.json();
         if (!data) throw new Error('No progress data returned');
 
+        // Normalize API response to match UserProgress interface
+        const normalizedData: UserProgress = {
+          level: data.level || 'beginner',
+          modules: (data.activities || []).filter((a: any) => a.type.toLowerCase() === 'module').map((a: any, index: number) => ({
+            id: index + 1, // Fallback ID if not provided
+            title: a.title,
+            type: a.type,
+            status: a.status,
+            score: a.score,
+          })),
+          quizzes: (data.activities || []).filter((a: any) => a.type.toLowerCase() === 'quiz').map((a: any, index: number) => ({
+            id: index + 1, // Fallback ID if not provided
+            title: a.title,
+            type: a.type,
+            status: a.status,
+            score: a.score,
+          })),
+          simulations: (data.activities || []).filter((a: any) => a.type.toLowerCase() === 'simulation').map((a: any, index: number) => ({
+            id: index + 1, // Fallback ID if not provided
+            title: a.title,
+            type: a.type,
+            status: a.status,
+            score: a.score,
+          })),
+          assignments: [],
+        };
+
         const assignmentsRes = await fetch(`/api/assignments?userId=${session.user!.id}`);
         if (!assignmentsRes.ok) throw new Error(`Failed to fetch assignments: ${assignmentsRes.statusText}`);
         const assignments = await assignmentsRes.json();
+        console.log('Fetched progress:', data); // Debug log
         console.log('Fetched assignments:', assignments); // Debug log
         if (!Array.isArray(assignments)) throw new Error('Assignments is not an array');
 
-        setProgress({ ...data, assignments });
+        setProgress({ ...normalizedData, assignments });
       } catch (error) {
         console.error('Error fetching progress or assignments:', error);
         setErrorMessage('Failed to load progress or assignments. Please try again.');
-        setProgress({ level: 'beginner', modules: [], quizzes: [], simulations: [], assignments: [] });
+        setProgress({
+          level: 'beginner',
+          modules: [],
+          quizzes: [],
+          simulations: [],
+          assignments: [],
+        });
       }
     };
     fetchProgress();
@@ -73,9 +110,9 @@ export default function UserDashboard() {
   useEffect(() => {
     if (!progress || !session?.user?.id) return;
 
-    const completedSimulations = progress.simulations.filter(s => s.status === 'completed').length;
-    const completedQuizzes = progress.quizzes.filter(q => q.status === 'completed').length;
-    const completedModules = progress.modules.filter(m => m.status === 'completed').length;
+    const completedSimulations = (progress.simulations || []).filter(s => s.status === 'completed').length;
+    const completedQuizzes = (progress.quizzes || []).filter(q => q.status === 'completed').length;
+    const completedModules = (progress.modules || []).filter(m => m.status === 'completed').length;
 
     const simulationProgress = Math.min(completedSimulations, 1) / 1; // 20%
     const quizProgress = Math.min(completedQuizzes, 2) / 2; // 40%
@@ -139,11 +176,19 @@ export default function UserDashboard() {
   };
 
   if (status === 'loading' || !progress) {
-    return <div className="container mx-auto p-6 text-white">Loading...</div>;
+    return (
+      <div className="container mx-auto p-6 text-white flex items-center justify-center">
+        <Loader2 className="h-6 w-6 text-cyan-400 animate-spin" />
+      </div>
+    );
   }
 
   if (!session?.user) {
-    return <div className="container mx-auto p-6 text-white">Please log in to view your dashboard.</div>;
+    return (
+      <div className="container mx-auto p-6 text-white">
+        Please log in to view your dashboard.
+      </div>
+    );
   }
 
   return (
@@ -173,14 +218,13 @@ export default function UserDashboard() {
           </div>
           <p className="text-md text-gray-400 mt-2">Progress: {Math.round(progressPercentage)}%</p>
           <div className="mt-4 space-y-2 text-sm text-gray-300">
-            <p>Simulations: {progress.simulations.filter(s => s.status === 'completed').length}/1</p>
-            <p>Quizzes: {progress.quizzes.filter(q => q.status === 'completed').length}/2</p>
-            <p>Modules: {progress.modules.filter(m => m.status === 'completed').length}/2</p>
+            <p>Simulations: {(progress.simulations || []).filter(s => s.status === 'completed').length}/1</p>
+            <p>Quizzes: {(progress.quizzes || []).filter(q => q.status === 'completed').length}/2</p>
+            <p>Modules: {(progress.modules || []).filter(m => m.status === 'completed').length}/2</p>
           </div>
         </CardContent>
       </Card>
-
-     <Card className="bg-gray-800 border-gray-600">
+      <Card className="bg-gray-800 border-gray-600">
         <CardHeader>
           <CardTitle className="text-white">My Assigned Content</CardTitle>
         </CardHeader>
@@ -203,17 +247,17 @@ export default function UserDashboard() {
                     <span>- Status: {assignment.status}</span>
                     <TooltipProvider>
                       <Tooltip>
-                        <TooltipTrigger asChild>
+                        <TooltipTrigger>
                           <Button
                             onClick={() => handleComplete(assignment.contentId, contentType)}
-                            disabled={progressItem?.status === 'completed'}
-                            className={`px-2 text-sm ${progressItem?.status === 'completed' ? 'bg-gray-500 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'}`}
+                            disabled={progressItem?.status === 'completed' || assignment.status === 'done'}
+                            className={`px-2 py-1 text-sm ${progressItem?.status === 'completed' || assignment.status === 'done' ? 'bg-gray-500 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'}`}
                           >
-                            {progressItem?.status === 'completed' ? 'Completed' : 'Mark Completed'}
+                            {progressItem?.status === 'completed' || assignment.status === 'done' ? 'Completed' : 'Mark Completed'}
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>
-                          {progressItem?.status === 'completed' ? 'Already completed' : 'Mark as completed'}
+                          {progressItem?.status === 'completed' || assignment.status === 'done' ? 'Already completed' : 'Mark as completed'}
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
