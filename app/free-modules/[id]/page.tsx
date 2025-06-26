@@ -40,7 +40,7 @@ export default async function FreeModulePage({ params }: FreeModulePageProps) {
             Want to learn more advanced cybersecurity skills?
           </p>
           <Link href="/auth/signup">
-            <button className="bg-cyan-500 hover:bg-cyan-600 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300">
+            <button className="bg-cyan-500 hover:bg-cyan-600 cursor-pointer text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300">
               Sign Up to Access More Modules
             </button>
           </Link>

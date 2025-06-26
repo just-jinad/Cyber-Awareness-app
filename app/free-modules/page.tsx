@@ -35,7 +35,7 @@ export default function FreeModules() {
                 <p className="text-gray-200 leading-relaxed mb-6">
                   {module.description}
                 </p>
-                <button className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors flex items-center space-x-2">
+                <button className="text-cyan-400 hover:text-cyan-300 cursor-pointer font-semibold transition-colors flex items-center space-x-2">
                   <span>Read More</span>
                   <span>→</span>
                 </button>
