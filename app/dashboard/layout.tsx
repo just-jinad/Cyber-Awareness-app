@@ -1,17 +1,39 @@
 'use client';
 
 import { useSession, signOut } from 'next-auth/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Book, Play, List, LogOut, Menu, Home, Bell, Search, User, Settings, BarChart3, Filter, Calendar, UserPen } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { toast, Toaster } from 'react-hot-toast';
 
+const currentYear = new Date().getFullYear();
+const academicStart = `1 Sept, ${currentYear}`;
+const academicEnd = `30 June, ${currentYear + 1}`;
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const [currentDate, setCurrentDate] = useState('');
+
+  useEffect(() => {
+    const updateDate = () => {
+      const now = new Date();
+      const options: Intl.DateTimeFormatOptions = { 
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      };
+      setCurrentDate(now.toLocaleDateString('en-US', options));
+    };
+
+    updateDate(); // Initial update
+    const timer = setInterval(updateDate, 1000 * 60); // Update every minute
+
+    return () => clearInterval(timer);
+  }, []);
 
   const handleLogout = () => {
     toast.custom((t) => (
@@ -150,7 +172,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               {/* Date Range */}
               <div className="hidden lg:flex items-center space-x-2 bg-gray-700 px-3 py-2 rounded-lg">
                 <Calendar className="h-4 w-4 text-gray-400" />
-                <span className="text-sm text-gray-300">23 May - 15 Nov, 2024</span>
+                <span className="text-sm text-gray-300">{currentDate}</span>
               </div>
 
               {/* Filter */}
