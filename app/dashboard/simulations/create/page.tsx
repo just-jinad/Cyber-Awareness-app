@@ -1,13 +1,28 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { toast } from 'react-hot-toast';
-import { useRouter } from 'next/navigation';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Save, Eye, Plus, Minus, GitBranch, Play, Target } from 'lucide-react';
-import Link from 'next/link';
+import { useState } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { toast } from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  ArrowLeft,
+  Save,
+  Eye,
+  Plus,
+  Minus,
+  GitBranch,
+  Play,
+  Target,
+} from "lucide-react";
+import Link from "next/link";
 
 interface Step {
   scenario: string;
@@ -18,17 +33,24 @@ interface Step {
 
 export default function CreateSimulation() {
   const [newSimulation, setNewSimulation] = useState({
-    title: '',
-    steps: [{ scenario: '', options: ['', ''], nextStep: [null, null] as (number | null)[], outcomes: ['', ''] }],
+    title: "",
+    steps: [
+      {
+        scenario: "",
+        options: ["", ""],
+        nextStep: [null, null] as (number | null)[],
+        outcomes: ["", ""],
+      },
+    ],
   });
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleAddSimulation = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!newSimulation.title.trim()) {
-      toast.error('Please enter a simulation title');
+      toast.error("Please enter a simulation title");
       return;
     }
 
@@ -49,26 +71,26 @@ export default function CreateSimulation() {
 
     setLoading(true);
 
-    const updatedSteps = newSimulation.steps.map(step => ({
+    const updatedSteps = newSimulation.steps.map((step) => ({
       ...step,
-      outcomes: step.options.map((_, idx) => step.outcomes?.[idx] || ''),
+      outcomes: step.options.map((_, idx) => step.outcomes?.[idx] || ""),
     }));
 
     try {
-      const res = await fetch('/api/simulations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/simulations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...newSimulation, steps: updatedSteps }),
       });
       if (res.ok) {
-        toast.success('Simulation created successfully!');
-        router.push('/dashboard/simulations');
+        toast.success("Simulation created successfully!");
+        router.push("/dashboard/simulations");
       } else {
         const { error } = await res.json();
-        toast.error(`Failed to create simulation: ${error || 'Unknown error'}`);
+        toast.error(`Failed to create simulation: ${error || "Unknown error"}`);
       }
     } catch (error) {
-      toast.error('An error occurred while creating the simulation');
+      toast.error("An error occurred while creating the simulation");
     } finally {
       setLoading(false);
     }
@@ -77,7 +99,15 @@ export default function CreateSimulation() {
   const addStep = () => {
     setNewSimulation({
       ...newSimulation,
-      steps: [...newSimulation.steps, { scenario: '', options: ['', ''], nextStep: [null, null] as (number | null)[], outcomes: ['', ''] }],
+      steps: [
+        ...newSimulation.steps,
+        {
+          scenario: "",
+          options: ["", ""],
+          nextStep: [null, null] as (number | null)[],
+          outcomes: ["", ""],
+        },
+      ],
     });
   };
 
@@ -94,9 +124,9 @@ export default function CreateSimulation() {
     const updatedSteps = [...newSimulation.steps];
     updatedSteps[stepIndex] = {
       ...updatedSteps[stepIndex],
-      options: [...updatedSteps[stepIndex].options, ''],
+      options: [...updatedSteps[stepIndex].options, ""],
       nextStep: [...updatedSteps[stepIndex].nextStep, null],
-      outcomes: [...(updatedSteps[stepIndex].outcomes || []), ''],
+      outcomes: [...(updatedSteps[stepIndex].outcomes || []), ""],
     };
     setNewSimulation({ ...newSimulation, steps: updatedSteps });
   };
@@ -104,82 +134,109 @@ export default function CreateSimulation() {
   const removeOption = (stepIndex: number, optionIndex: number) => {
     const updatedSteps = [...newSimulation.steps];
     if (updatedSteps[stepIndex].options.length <= 2) {
-      toast.error('Each step must have at least two options');
+      toast.error("Each step must have at least two options");
       return;
     }
     updatedSteps[stepIndex] = {
       ...updatedSteps[stepIndex],
-      options: updatedSteps[stepIndex].options.filter((_, idx) => idx !== optionIndex),
-      nextStep: updatedSteps[stepIndex].nextStep.filter((_, idx) => idx !== optionIndex),
-      outcomes: (updatedSteps[stepIndex].outcomes || []).filter((_, idx) => idx !== optionIndex),
+      options: updatedSteps[stepIndex].options.filter(
+        (_, idx) => idx !== optionIndex
+      ),
+      nextStep: updatedSteps[stepIndex].nextStep.filter(
+        (_, idx) => idx !== optionIndex
+      ),
+      outcomes: (updatedSteps[stepIndex].outcomes || []).filter(
+        (_, idx) => idx !== optionIndex
+      ),
     };
     setNewSimulation({ ...newSimulation, steps: updatedSteps });
   };
 
   const updateStep = (stepIndex: number, field: keyof Step, value: any) => {
     const updatedSteps = [...newSimulation.steps];
-    if (field === 'options') {
+    if (field === "options") {
       const updatedOptions = value as string[];
       updatedSteps[stepIndex] = {
         ...updatedSteps[stepIndex],
         [field]: updatedOptions,
         nextStep: Array(updatedOptions.length).fill(null) as (number | null)[],
-        outcomes: Array(updatedOptions.length).fill('') as string[],
+        outcomes: Array(updatedOptions.length).fill("") as string[],
       };
-    } else if (field === 'nextStep') {
+    } else if (field === "nextStep") {
       const updatedNextStep = value as (number | null)[];
       if (updatedNextStep.length !== updatedSteps[stepIndex].options.length) {
-        toast.error('Number of next steps must match number of options');
+        toast.error("Number of next steps must match number of options");
         return;
       }
-      updatedSteps[stepIndex] = { ...updatedSteps[stepIndex], [field]: updatedNextStep };
-    } else if (field === 'outcomes') {
+      updatedSteps[stepIndex] = {
+        ...updatedSteps[stepIndex],
+        [field]: updatedNextStep,
+      };
+    } else if (field === "outcomes") {
       const updatedOutcomes = value as string[];
       if (updatedOutcomes.length !== updatedSteps[stepIndex].options.length) {
-        toast.error('Number of outcomes must match number of options');
+        toast.error("Number of outcomes must match number of options");
         return;
       }
-      updatedSteps[stepIndex] = { ...updatedSteps[stepIndex], [field]: updatedOutcomes };
+      updatedSteps[stepIndex] = {
+        ...updatedSteps[stepIndex],
+        [field]: updatedOutcomes,
+      };
     } else {
       updatedSteps[stepIndex] = { ...updatedSteps[stepIndex], [field]: value };
     }
     setNewSimulation({ ...newSimulation, steps: updatedSteps });
   };
 
-  const updateOption = (stepIndex: number, optionIndex: number, value: string) => {
+  const updateOption = (
+    stepIndex: number,
+    optionIndex: number,
+    value: string
+  ) => {
     const updatedSteps = [...newSimulation.steps];
     const updatedOptions = [...updatedSteps[stepIndex].options];
     updatedOptions[optionIndex] = value;
-    updateStep(stepIndex, 'options', updatedOptions);
+    updateStep(stepIndex, "options", updatedOptions);
   };
 
-  const updateNextStep = (stepIndex: number, optionIndex: number, value: string) => {
+  const updateNextStep = (
+    stepIndex: number,
+    optionIndex: number,
+    value: string
+  ) => {
     const updatedSteps = [...newSimulation.steps];
     const updatedNextStep = [...updatedSteps[stepIndex].nextStep];
-    if (value === 'end') {
+    if (value === "end") {
       updatedNextStep[optionIndex] = null;
-    } else if (value.startsWith('future-step-')) {
-      updatedNextStep[optionIndex] = parseInt(value.split('-')[2], 10);
-    } else if (value.startsWith('next-step-')) {
-      updatedNextStep[optionIndex] = parseInt(value.split('-')[2], 10);
+    } else if (value.startsWith("future-step-")) {
+      updatedNextStep[optionIndex] = parseInt(value.split("-")[2], 10);
+    } else if (value.startsWith("next-step-")) {
+      updatedNextStep[optionIndex] = parseInt(value.split("-")[2], 10);
     }
-    updateStep(stepIndex, 'nextStep', updatedNextStep);
+    updateStep(stepIndex, "nextStep", updatedNextStep);
   };
 
-  const updateOutcome = (stepIndex: number, optionIndex: number, value: string) => {
+  const updateOutcome = (
+    stepIndex: number,
+    optionIndex: number,
+    value: string
+  ) => {
     const updatedSteps = [...newSimulation.steps];
     const updatedOutcomes = [...(updatedSteps[stepIndex].outcomes || [])];
     updatedOutcomes[optionIndex] = value;
-    updateStep(stepIndex, 'outcomes', updatedOutcomes);
+    updateStep(stepIndex, "outcomes", updatedOutcomes);
   };
 
   const getTotalOptions = () => {
-    return newSimulation.steps.reduce((total, step) => total + step.options.length, 0);
+    return newSimulation.steps.reduce(
+      (total, step) => total + step.options.length,
+      0
+    );
   };
 
   const getEndingPaths = () => {
     return newSimulation.steps.reduce((total, step) => {
-      return total + step.nextStep.filter(next => next === null).length;
+      return total + step.nextStep.filter((next) => next === null).length;
     }, 0);
   };
 
@@ -188,14 +245,22 @@ export default function CreateSimulation() {
       {/* Header */}
       <div className="flex items-center space-x-4">
         <Link href="/dashboard/simulations">
-          <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white hover:bg-gray-700">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-gray-300 hover:text-white hover:bg-gray-700"
+          >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Simulations
           </Button>
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-white">Create New Simulation</h1>
-          <p className="text-gray-400 mt-1">Build interactive decision-making scenarios</p>
+          <h1 className="text-2xl font-bold text-white">
+            Create New Simulation
+          </h1>
+          <p className="text-gray-400 mt-1">
+            Build interactive decision-making scenarios
+          </p>
         </div>
       </div>
 
@@ -213,7 +278,10 @@ export default function CreateSimulation() {
               <form onSubmit={handleAddSimulation} className="space-y-6">
                 {/* Title Field */}
                 <div>
-                  <label htmlFor="title" className="block text-sm font-medium text-gray-300 mb-2">
+                  <label
+                    htmlFor="title"
+                    className="block text-sm font-medium text-gray-300 mb-2"
+                  >
                     Simulation Title <span className="text-red-400">*</span>
                   </label>
                   <input
@@ -221,7 +289,12 @@ export default function CreateSimulation() {
                     type="text"
                     className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors"
                     value={newSimulation.title}
-                    onChange={(e) => setNewSimulation({ ...newSimulation, title: e.target.value })}
+                    onChange={(e) =>
+                      setNewSimulation({
+                        ...newSimulation,
+                        title: e.target.value,
+                      })
+                    }
                     placeholder="Enter a descriptive title for your simulation"
                     maxLength={100}
                     required
@@ -240,27 +313,28 @@ export default function CreateSimulation() {
                     <Button
                       type="button"
                       onClick={addStep}
-                      variant="outline"
-                      size="sm"
-                      className="border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
+                      className="fixed bottom-6 right-6 bg-cyan-600 hover:bg-cyan-700 text-white rounded-full p-3 shadow-lg"
                     >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Step
+                      <Plus className="h-6 w-6" />
+                      Add step
                     </Button>
                   </div>
 
                   {newSimulation.steps.map((step, stepIndex) => (
-                    <div key={stepIndex} className="bg-gray-700 border border-gray-600 rounded-lg p-4 space-y-4">
+                    <div
+                      key={stepIndex}
+                      className="bg-gray-700 border border-gray-600 rounded-lg p-4 space-y-4"
+                    >
                       <div className="flex justify-between items-center">
                         <h3 className="text-lg font-semibold text-white flex items-center">
                           <GitBranch className="h-4 w-4 mr-2" />
                           Step {stepIndex + 1}
                         </h3>
                         {newSimulation.steps.length > 1 && (
-                          <Button 
+                          <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => removeStep(stepIndex)} 
+                            onClick={() => removeStep(stepIndex)}
                             type="button"
                             className="text-red-400 hover:text-red-300 hover:bg-red-400/10"
                           >
@@ -272,15 +346,21 @@ export default function CreateSimulation() {
 
                       {/* Scenario */}
                       <div>
-                        <label htmlFor={`scenario-${stepIndex}`} className="block text-sm font-medium text-gray-300 mb-2">
-                          Scenario Description <span className="text-red-400">*</span>
+                        <label
+                          htmlFor={`scenario-${stepIndex}`}
+                          className="block text-sm font-medium text-gray-300 mb-2"
+                        >
+                          Scenario Description{" "}
+                          <span className="text-red-400">*</span>
                         </label>
                         <textarea
                           id={`scenario-${stepIndex}`}
                           rows={3}
                           className="w-full bg-gray-600 border border-gray-500 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors resize-vertical"
                           value={step.scenario}
-                          onChange={(e) => updateStep(stepIndex, 'scenario', e.target.value)}
+                          onChange={(e) =>
+                            updateStep(stepIndex, "scenario", e.target.value)
+                          }
                           placeholder="Describe the scenario users will encounter"
                           required
                         />
@@ -290,7 +370,8 @@ export default function CreateSimulation() {
                       <div>
                         <div className="flex justify-between items-center mb-3">
                           <label className="block text-sm font-medium text-gray-300">
-                            Decision Options <span className="text-red-400">*</span>
+                            Decision Options{" "}
+                            <span className="text-red-400">*</span>
                           </label>
                           <Button
                             type="button"
@@ -305,13 +386,22 @@ export default function CreateSimulation() {
                         </div>
 
                         {step.options.map((option, optionIndex) => (
-                          <div key={optionIndex} className="bg-gray-600 border border-gray-500 rounded-lg p-3 mb-3 space-y-3">
+                          <div
+                            key={optionIndex}
+                            className="bg-gray-600 border border-gray-500 rounded-lg p-3 mb-3 space-y-3"
+                          >
                             <div className="flex items-center space-x-3">
                               <input
                                 type="text"
                                 className="flex-1 bg-gray-500 border border-gray-400 rounded px-3 py-2 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors"
                                 value={option}
-                                onChange={(e) => updateOption(stepIndex, optionIndex, e.target.value)}
+                                onChange={(e) =>
+                                  updateOption(
+                                    stepIndex,
+                                    optionIndex,
+                                    e.target.value
+                                  )
+                                }
                                 placeholder={`Option ${optionIndex + 1}`}
                                 required
                               />
@@ -319,7 +409,9 @@ export default function CreateSimulation() {
                                 type="button"
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => removeOption(stepIndex, optionIndex)}
+                                onClick={() =>
+                                  removeOption(stepIndex, optionIndex)
+                                }
                                 disabled={step.options.length <= 2}
                                 className="text-red-400 hover:text-red-300 hover:bg-red-400/10 disabled:opacity-50 disabled:cursor-not-allowed"
                               >
@@ -328,28 +420,42 @@ export default function CreateSimulation() {
                             </div>
 
                             <div className="flex items-center space-x-3">
-                              <label className="text-sm text-gray-300 whitespace-nowrap">Next Step:</label>
+                              <label className="text-sm text-gray-300 whitespace-nowrap">
+                                Next Step:
+                              </label>
                               <Select
                                 value={
                                   step.nextStep[optionIndex] === null
-                                    ? 'end'
-                                    : newSimulation.steps.findIndex((_, idx) => idx === step.nextStep[optionIndex]) >
-                                        stepIndex + 1
+                                    ? "end"
+                                    : newSimulation.steps.findIndex(
+                                        (_, idx) =>
+                                          idx === step.nextStep[optionIndex]
+                                      ) >
+                                      stepIndex + 1
                                     ? `future-step-${step.nextStep[optionIndex]}`
                                     : `next-step-${step.nextStep[optionIndex]}`
                                 }
-                                onValueChange={(value) => updateNextStep(stepIndex, optionIndex, value)}
+                                onValueChange={(value) =>
+                                  updateNextStep(stepIndex, optionIndex, value)
+                                }
                               >
                                 <SelectTrigger className="bg-gray-500 border-gray-400 text-white">
                                   <SelectValue placeholder="Select next step" />
                                 </SelectTrigger>
                                 <SelectContent className="bg-gray-700 border-gray-600">
-                                  <SelectItem key="end" value="end" className="text-white hover:bg-gray-600">
+                                  <SelectItem
+                                    key="end"
+                                    value="end"
+                                    className="text-white hover:bg-gray-600"
+                                  >
                                     End Simulation
                                   </SelectItem>
                                   {newSimulation.steps.map((_, idx) => {
                                     const nextStepNum = idx + 1;
-                                    if (idx !== stepIndex && nextStepNum > stepIndex + 1) {
+                                    if (
+                                      idx !== stepIndex &&
+                                      nextStepNum > stepIndex + 1
+                                    ) {
                                       return (
                                         <SelectItem
                                           key={`future-step-${idx}`}
@@ -362,7 +468,8 @@ export default function CreateSimulation() {
                                     }
                                     return null;
                                   })}
-                                  {stepIndex + 1 < newSimulation.steps.length && (
+                                  {stepIndex + 1 <
+                                    newSimulation.steps.length && (
                                     <SelectItem
                                       key={`next-in-sequence-${stepIndex}`}
                                       value={`next-step-${stepIndex + 1}`}
@@ -378,13 +485,22 @@ export default function CreateSimulation() {
                             {step.nextStep[optionIndex] === null && (
                               <div>
                                 <label className="block text-sm text-gray-300 mb-1">
-                                  Outcome <span className="text-gray-500">(optional)</span>
+                                  Outcome{" "}
+                                  <span className="text-gray-500">
+                                    (optional)
+                                  </span>
                                 </label>
                                 <input
                                   type="text"
                                   className="w-full bg-gray-500 border border-gray-400 rounded px-3 py-2 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors"
-                                  value={step.outcomes?.[optionIndex] || ''}
-                                  onChange={(e) => updateOutcome(stepIndex, optionIndex, e.target.value)}
+                                  value={step.outcomes?.[optionIndex] || ""}
+                                  onChange={(e) =>
+                                    updateOutcome(
+                                      stepIndex,
+                                      optionIndex,
+                                      e.target.value
+                                    )
+                                  }
                                   placeholder="e.g., 'success', 'neutral', 'breach'"
                                 />
                               </div>
@@ -416,9 +532,9 @@ export default function CreateSimulation() {
                     )}
                   </Button>
                   <Link href="/dashboard/simulations">
-                    <Button 
-                      type="button" 
-                      variant="outline" 
+                    <Button
+                      type="button"
+                      variant="outline"
                       className="border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
                       disabled={loading}
                     >
@@ -446,10 +562,11 @@ export default function CreateSimulation() {
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-2 flex items-center">
                     <Play className="h-4 w-4 mr-2" />
-                    {newSimulation.title || 'Simulation Title'}
+                    {newSimulation.title || "Simulation Title"}
                   </h3>
                   <p className="text-gray-400 text-sm">
-                    Interactive decision-making scenario with multiple paths and outcomes.
+                    Interactive decision-making scenario with multiple paths and
+                    outcomes.
                   </p>
                 </div>
 
@@ -457,7 +574,9 @@ export default function CreateSimulation() {
                 <div className="bg-gray-700 rounded-lg p-4 space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-400">Total Steps:</span>
-                    <span className="text-white">{newSimulation.steps.length}</span>
+                    <span className="text-white">
+                      {newSimulation.steps.length}
+                    </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-400">Total Options:</span>
@@ -469,7 +588,9 @@ export default function CreateSimulation() {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-400">Title Length:</span>
-                    <span className="text-white">{newSimulation.title.length} chars</span>
+                    <span className="text-white">
+                      {newSimulation.title.length} chars
+                    </span>
                   </div>
                 </div>
 
@@ -478,17 +599,22 @@ export default function CreateSimulation() {
                   <div className="bg-gray-700 rounded-lg p-4">
                     <div className="flex items-center mb-3">
                       <Target className="h-4 w-4 mr-2 text-cyan-400" />
-                      <span className="text-sm font-medium text-gray-300">Current Steps</span>
+                      <span className="text-sm font-medium text-gray-300">
+                        Current Steps
+                      </span>
                     </div>
                     <div className="space-y-2 max-h-40 overflow-y-auto">
                       {newSimulation.steps.map((step, index) => (
                         <div key={index} className="text-sm">
-                          <div className="text-white font-medium">Step {index + 1}</div>
+                          <div className="text-white font-medium">
+                            Step {index + 1}
+                          </div>
                           <div className="text-gray-400 truncate">
-                            {step.scenario || 'No scenario defined'}
+                            {step.scenario || "No scenario defined"}
                           </div>
                           <div className="text-xs text-gray-500">
-                            {step.options.length} option{step.options.length !== 1 ? 's' : ''}
+                            {step.options.length} option
+                            {step.options.length !== 1 ? "s" : ""}
                           </div>
                         </div>
                       ))}
