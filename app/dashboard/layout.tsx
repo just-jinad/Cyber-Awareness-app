@@ -105,7 +105,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="w-8 h-8 bg-cyan-500 hover:bg-cyan-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">C</span>
             </div>
+            <Link href="/" className='cursor-pointer'>
             <span className="text-lg font-semibold">CyberAware</span>
+            </Link>
           </div>
         </div>
         
