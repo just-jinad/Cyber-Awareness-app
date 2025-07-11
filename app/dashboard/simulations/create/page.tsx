@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-hot-toast";
@@ -44,7 +44,20 @@ export default function CreateSimulation() {
     ],
   });
   const [loading, setLoading] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const handleViewportChange = () => {
+      const button = document.querySelector(".floating-add-step") as HTMLElement | null;
+      if (button && window.visualViewport) {
+        button.style.bottom = `${window.visualViewport.offsetTop + 16}px`;
+      }
+    };
+    window.visualViewport?.addEventListener("resize", handleViewportChange);
+    return () =>
+      window.visualViewport?.removeEventListener("resize", handleViewportChange);
+  }, []);
 
   const handleAddSimulation = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -255,12 +268,8 @@ export default function CreateSimulation() {
           </Button>
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-white">
-            Create New Simulation
-          </h1>
-          <p className="text-gray-400 mt-1">
-            Build interactive decision-making scenarios
-          </p>
+          <h1 className="text-2xl font-bold text-white">Create New Simulation</h1>
+          <p className="text-gray-400 mt-1">Build interactive decision-making scenarios</p>
         </div>
       </div>
 
@@ -287,13 +296,10 @@ export default function CreateSimulation() {
                   <input
                     id="title"
                     type="text"
-                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors"
+                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-2 py-1 text-sm sm:px-4 sm:py-3 sm:text-base text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors"
                     value={newSimulation.title}
                     onChange={(e) =>
-                      setNewSimulation({
-                        ...newSimulation,
-                        title: e.target.value,
-                      })
+                      setNewSimulation({ ...newSimulation, title: e.target.value })
                     }
                     placeholder="Enter a descriptive title for your simulation"
                     maxLength={100}
@@ -310,14 +316,7 @@ export default function CreateSimulation() {
                     <label className="block text-sm font-medium text-gray-300">
                       Simulation Steps <span className="text-red-400">*</span>
                     </label>
-                    <Button
-                      type="button"
-                      onClick={addStep}
-                      className="fixed bottom-6 right-6 bg-cyan-600 hover:bg-cyan-700 text-white rounded-full p-3 shadow-lg"
-                    >
-                      <Plus className="h-6 w-6" />
-                      Add step
-                    </Button>
+                    {/* Floating button replaces inline Add Step button */}
                   </div>
 
                   {newSimulation.steps.map((step, stepIndex) => (
@@ -350,13 +349,12 @@ export default function CreateSimulation() {
                           htmlFor={`scenario-${stepIndex}`}
                           className="block text-sm font-medium text-gray-300 mb-2"
                         >
-                          Scenario Description{" "}
-                          <span className="text-red-400">*</span>
+                          Scenario Description <span className="text-red-400">*</span>
                         </label>
                         <textarea
                           id={`scenario-${stepIndex}`}
                           rows={3}
-                          className="w-full bg-gray-600 border border-gray-500 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors resize-vertical"
+                          className="w-full bg-gray-600 border border-gray-500 rounded-lg px-2 py-2 text-sm sm:px-4 sm:py-3 sm:text-base text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors resize-vertical"
                           value={step.scenario}
                           onChange={(e) =>
                             updateStep(stepIndex, "scenario", e.target.value)
@@ -370,8 +368,7 @@ export default function CreateSimulation() {
                       <div>
                         <div className="flex justify-between items-center mb-3">
                           <label className="block text-sm font-medium text-gray-300">
-                            Decision Options{" "}
-                            <span className="text-red-400">*</span>
+                            Decision Options <span className="text-red-400">*</span>
                           </label>
                           <Button
                             type="button"
@@ -393,14 +390,10 @@ export default function CreateSimulation() {
                             <div className="flex items-center space-x-3">
                               <input
                                 type="text"
-                                className="flex-1 bg-gray-500 border border-gray-400 rounded px-3 py-2 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors"
+                                className="flex-1 bg-gray-500 border border-gray-400 rounded px-2 py-1 text-sm sm:px-3 sm:py-2 sm:text-base text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors"
                                 value={option}
                                 onChange={(e) =>
-                                  updateOption(
-                                    stepIndex,
-                                    optionIndex,
-                                    e.target.value
-                                  )
+                                  updateOption(stepIndex, optionIndex, e.target.value)
                                 }
                                 placeholder={`Option ${optionIndex + 1}`}
                                 required
@@ -409,9 +402,7 @@ export default function CreateSimulation() {
                                 type="button"
                                 variant="ghost"
                                 size="sm"
-                                onClick={() =>
-                                  removeOption(stepIndex, optionIndex)
-                                }
+                                onClick={() => removeOption(stepIndex, optionIndex)}
                                 disabled={step.options.length <= 2}
                                 className="text-red-400 hover:text-red-300 hover:bg-red-400/10 disabled:opacity-50 disabled:cursor-not-allowed"
                               >
@@ -428,10 +419,8 @@ export default function CreateSimulation() {
                                   step.nextStep[optionIndex] === null
                                     ? "end"
                                     : newSimulation.steps.findIndex(
-                                        (_, idx) =>
-                                          idx === step.nextStep[optionIndex]
-                                      ) >
-                                      stepIndex + 1
+                                        (_, idx) => idx === step.nextStep[optionIndex]
+                                      ) > stepIndex + 1
                                     ? `future-step-${step.nextStep[optionIndex]}`
                                     : `next-step-${step.nextStep[optionIndex]}`
                                 }
@@ -452,10 +441,7 @@ export default function CreateSimulation() {
                                   </SelectItem>
                                   {newSimulation.steps.map((_, idx) => {
                                     const nextStepNum = idx + 1;
-                                    if (
-                                      idx !== stepIndex &&
-                                      nextStepNum > stepIndex + 1
-                                    ) {
+                                    if (idx !== stepIndex && nextStepNum > stepIndex + 1) {
                                       return (
                                         <SelectItem
                                           key={`future-step-${idx}`}
@@ -468,8 +454,7 @@ export default function CreateSimulation() {
                                     }
                                     return null;
                                   })}
-                                  {stepIndex + 1 <
-                                    newSimulation.steps.length && (
+                                  {stepIndex + 1 < newSimulation.steps.length && (
                                     <SelectItem
                                       key={`next-in-sequence-${stepIndex}`}
                                       value={`next-step-${stepIndex + 1}`}
@@ -485,21 +470,14 @@ export default function CreateSimulation() {
                             {step.nextStep[optionIndex] === null && (
                               <div>
                                 <label className="block text-sm text-gray-300 mb-1">
-                                  Outcome{" "}
-                                  <span className="text-gray-500">
-                                    (optional)
-                                  </span>
+                                  Outcome <span className="text-gray-500">(optional)</span>
                                 </label>
                                 <input
                                   type="text"
-                                  className="w-full bg-gray-500 border border-gray-400 rounded px-3 py-2 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors"
+                                  className="w-full bg-gray-500 border border-gray-400 rounded px-2 py-1 text-sm sm:px-3 sm:py-2 sm:text-base text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors"
                                   value={step.outcomes?.[optionIndex] || ""}
                                   onChange={(e) =>
-                                    updateOutcome(
-                                      stepIndex,
-                                      optionIndex,
-                                      e.target.value
-                                    )
+                                    updateOutcome(stepIndex, optionIndex, e.target.value)
                                   }
                                   placeholder="e.g., 'success', 'neutral', 'breach'"
                                 />
@@ -511,6 +489,15 @@ export default function CreateSimulation() {
                     </div>
                   ))}
                 </div>
+
+                {/* Floating Add Step Button */}
+                <Button
+                  type="button"
+                  onClick={addStep}
+                  className="floating-add-step fixed bottom-4 right-4 sm:bottom-6 sm:right-6 bg-cyan-600 hover:bg-cyan-700 text-white rounded-full p-2 sm:p-3 shadow-lg z-50 md:p-4"
+                >
+                  <Plus className="h-5 w-5 sm:h-6 sm:w-6" />
+                </Button>
 
                 {/* Action Buttons */}
                 <div className="flex space-x-4 pt-6">
@@ -549,81 +536,79 @@ export default function CreateSimulation() {
 
         {/* Preview Sidebar */}
         <div className="lg:col-span-1">
-          <Card className="bg-gray-800 border-gray-700 sticky top-6">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center">
-                <Eye className="h-5 w-5 mr-2" />
-                Preview
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {/* Simulation Overview */}
-                <div>
-                  <h3 className="text-lg font-semibold text-white mb-2 flex items-center">
-                    <Play className="h-4 w-4 mr-2" />
-                    {newSimulation.title || "Simulation Title"}
-                  </h3>
-                  <p className="text-gray-400 text-sm">
-                    Interactive decision-making scenario with multiple paths and
-                    outcomes.
-                  </p>
-                </div>
-
-                {/* Simulation Stats */}
-                <div className="bg-gray-700 rounded-lg p-4 space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-400">Total Steps:</span>
-                    <span className="text-white">
-                      {newSimulation.steps.length}
-                    </span>
+          {/* Toggle button only for small screens */}
+          <Button
+            className="lg:hidden mb-4 w-full bg-gray-700 text-white"
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          >
+            {isSidebarOpen ? "Hide Preview" : "Show Preview"}
+          </Button>
+          
+          {/* Preview card: show if isSidebarOpen on small screens, always show on lg screens */}
+          <div className={`${!isSidebarOpen ? 'hidden lg:block' : 'block'}`}>
+            <Card className="bg-gray-800 border-gray-700 lg:sticky lg:top-6 max-h-[calc(100vh-2rem)] overflow-y-auto">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center">
+                  <Eye className="h-5 w-5 mr-2" />
+                  Preview
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-2 flex items-center">
+                      <Play className="h-4 w-4 mr-2" />
+                      {newSimulation.title || "Simulation Title"}
+                    </h3>
+                    <p className="text-gray-400 text-sm">
+                      Interactive decision-making scenario with multiple paths and outcomes.
+                    </p>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-400">Total Options:</span>
-                    <span className="text-white">{getTotalOptions()}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-400">Ending Paths:</span>
-                    <span className="text-white">{getEndingPaths()}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-400">Title Length:</span>
-                    <span className="text-white">
-                      {newSimulation.title.length} chars
-                    </span>
-                  </div>
-                </div>
-
-                {/* Step Preview */}
-                {newSimulation.steps.length > 0 && (
-                  <div className="bg-gray-700 rounded-lg p-4">
-                    <div className="flex items-center mb-3">
-                      <Target className="h-4 w-4 mr-2 text-cyan-400" />
-                      <span className="text-sm font-medium text-gray-300">
-                        Current Steps
-                      </span>
+                  <div className="bg-gray-700 rounded-lg p-4 space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-400">Total Steps:</span>
+                      <span className="text-white">{newSimulation.steps.length}</span>
                     </div>
-                    <div className="space-y-2 max-h-40 overflow-y-auto">
-                      {newSimulation.steps.map((step, index) => (
-                        <div key={index} className="text-sm">
-                          <div className="text-white font-medium">
-                            Step {index + 1}
-                          </div>
-                          <div className="text-gray-400 truncate">
-                            {step.scenario || "No scenario defined"}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {step.options.length} option
-                            {step.options.length !== 1 ? "s" : ""}
-                          </div>
-                        </div>
-                      ))}
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-400">Total Options:</span>
+                      <span className="text-white">{getTotalOptions()}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-400">Ending Paths:</span>
+                      <span className="text-white">{getEndingPaths()}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-400">Title Length:</span>
+                      <span className="text-white">{newSimulation.title.length} chars</span>
                     </div>
                   </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                  {newSimulation.steps.length > 0 && (
+                    <div className="bg-gray-700 rounded-lg p-4">
+                      <div className="flex items-center mb-3">
+                        <Target className="h-4 w-4 mr-2 text-cyan-400" />
+                        <span className="text-sm font-medium text-gray-300">
+                          Current Steps
+                        </span>
+                      </div>
+                      <div className="space-y-2 max-h-40 overflow-y-auto">
+                        {newSimulation.steps.map((step, index) => (
+                          <div key={index} className="text-sm">
+                            <div className="text-white font-medium">Step {index + 1}</div>
+                            <div className="text-gray-400 truncate">
+                              {step.scenario || "No scenario defined"}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {step.options.length} option{step.options.length !== 1 ? "s" : ""}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
