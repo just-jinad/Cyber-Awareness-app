@@ -15,12 +15,12 @@ const Footer = () => {
               <span className="text-white text-xl font-bold">CyberAware</span>
             </div>
             <p className="text-gray-300 leading-relaxed">
-              A Cybersecurity Awareness Platform by SQI College of ICT, Ogbomoso, empowering students, educators, and organizations with interactive tools to combat cyber threats and promote safe online practices.
+              A Cybersecurity Awareness Platform, that aims at empowering students, educators, and organizations with interactive tools to combat cyber threats and promote safe online practices.
             </p>
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
                 <Mail className="h-5 w-5 text-cyan-400" />
-                <span className="text-gray-300">info@cyberaware.sqiict.edu.ng</span>
+                <span className="text-gray-300">info@cyberaware.com</span>
               </div>
               <div className="flex items-center space-x-3">
                 <Phone className="h-5 w-5 text-cyan-400" />
@@ -28,7 +28,7 @@ const Footer = () => {
               </div>
               <div className="flex items-center space-x-3">
                 <MapPin className="h-5 w-5 text-cyan-400" />
-                <span className="text-gray-300">SQI College of ICT, Ogbomoso, Oyo State, Nigeria</span>
+                <span className="text-gray-300">Along Old illorin road, Ogbomoso, Oyo state</span>
               </div>
             </div>
           </div>
@@ -44,7 +44,6 @@ const Footer = () => {
                 'Safe Browsing',
                 'Data Protection',
                 'Social Engineering',
-                'Certification Program'
               ].map((resource, i) => (
                 <li key={i}>
                   <a href="#" className="text-gray-300 hover:text-cyan-400 transition-colors flex items-center space-x-2 group">
@@ -62,12 +61,9 @@ const Footer = () => {
             <ul className="space-y-3">
               {[
                 'About the Platform',
-                'SQI College of ICT',
                 'Our Mission',
                 'Team & Supervisors',
                 'Student Resources',
-                'Blog & News',
-                'Partners',
                 'Contact Us'
               ].map((item, i) => (
                 <li key={i}>
@@ -131,11 +127,10 @@ const Footer = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
             <div className="text-center md:text-left">
-              <h4 className="text-white font-medium mb-2">Affiliations & Standards</h4>
+              <h4 className="text-white font-medium  mb-2">Affiliations & Standards</h4>
               <div className="flex items-center space-x-6">
                 <div className="text-gray-300 text-sm">SQI College of ICT</div>
-                <div className="text-gray-300 text-sm">National Board for Technical Education</div>
-                <div className="text-gray-300 text-sm">Cybersecurity Awareness Certified</div>
+                <div className="text-gray-300 text-sm">Cybersecurity Awareness Platforrm</div>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -154,7 +149,7 @@ const Footer = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
             <div className="text-gray-400 text-sm">
-              © 2025 CyberAware, SQI College of ICT. All rights reserved.
+              © 2025 CyberAware. All rights reserved.
             </div>
             <div className="flex items-center space-x-6 text-sm">
               <a href="#" className="text-gray-400 hover:text-cyan-400 transition-colors">Privacy Policy</a>
