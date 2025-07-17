@@ -1,7 +1,17 @@
 import React from 'react';
 import { Shield, Mail, Phone, MapPin, Facebook, Twitter, Linkedin, Instagram, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 
 const Footer = () => {
+  const learningResources = [
+    { name: 'Malware Protection', href: '/free-modules/malware-protection' },
+    { name: 'Introduction to Phishing', href: '/free-modules/intro-to-phishing' },
+    { name: 'Advanced Password Security', href: '/free-modules/password-security-advanced' },
+    { name: 'Safe Browsing', href: '/free-modules/safe-browsing' },
+    { name: 'Data Protection', href: '/free-modules/data-protection' },
+    { name: 'Social Engineering', href: '/free-modules/social-engineering' },
+  ];
+
   return (
     <footer className="bg-slate-900 border-t border-slate-800">
       {/* Main Footer Content */}
@@ -37,19 +47,15 @@ const Footer = () => {
           <div className="space-y-6">
             <h3 className="text-white text-lg font-semibold">Learning Resources</h3>
             <ul className="space-y-3">
-              {[
-                'Phishing Awareness',
-                'Password Security',
-                'Malware Protection',
-                'Safe Browsing',
-                'Data Protection',
-                'Social Engineering',
-              ].map((resource, i) => (
+              {learningResources.map((resource, i) => (
                 <li key={i}>
-                  <a href="#" className="text-gray-300 hover:text-cyan-400 transition-colors flex items-center space-x-2 group">
+                  <Link
+                    href={resource.href}
+                    className="text-gray-300 hover:text-cyan-400 transition-colors flex items-center space-x-2 group"
+                  >
                     <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <span>{resource}</span>
-                  </a>
+                    <span>{resource.name}</span>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -60,17 +66,19 @@ const Footer = () => {
             <h3 className="text-white text-lg font-semibold">About</h3>
             <ul className="space-y-3">
               {[
-                'About the Platform',
-                'Our Mission',
-                'Team & Supervisors',
-                'Student Resources',
-                'Contact Us'
+                { name: 'About the Platform', href: '/About' },
+                { name: 'Our Mission', href: '/About' },
+                { name: 'Team & Supervisors', href: '/About' },
+                { name: 'Contact Us', href: '/Contact' }
               ].map((item, i) => (
                 <li key={i}>
-                  <a href="#" className="text-gray-300 hover:text-cyan-400 transition-colors flex items-center space-x-2 group">
+                  <Link
+                    href={item.href}
+                    className="text-gray-300 hover:text-cyan-400 transition-colors flex items-center space-x-2 group"
+                  >
                     <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <span>{item}</span>
-                  </a>
+                    <span>{item.name}</span>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -152,10 +160,10 @@ const Footer = () => {
               © 2025 CyberAware. All rights reserved.
             </div>
             <div className="flex items-center space-x-6 text-sm">
-              <a href="#" className="text-gray-400 hover:text-cyan-400 transition-colors">Privacy Policy</a>
+              {/* <a href="#" className="text-gray-400 hover:text-cyan-400 transition-colors">Privacy Policy</a>
               <a href="#" className="text-gray-400 hover:text-cyan-400 transition-colors">Terms of Use</a>
               <a href="#" className="text-gray-400 hover:text-cyan-400 transition-colors">Accessibility</a>
-              <a href="#" className="text-gray-400 hover:text-cyan-400 transition-colors">Support</a>
+              <a href="#" className="text-gray-400 hover:text-cyan-400 transition-colors">Support</a> */}
             </div>
           </div>
         </div>
