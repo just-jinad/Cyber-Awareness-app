@@ -150,7 +150,7 @@ export default function Signup() {
                   className="w-full px-4 mt-2 py-3 rounded-lg border border-slate-600 bg-slate-900/80 text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 focus:outline-none transition-all duration-200"
                 >
                   <option value="USER">User</option>
-                  <option value="ADMIN">Admin</option>
+                  {/* <option value="ADMIN">Admin</option> */}
                 </select>
                 {errors.role && (
                   <p className="text-red-500 text-sm mt-1 flex items-center">
